@@ -16,7 +16,7 @@
       font-family:'Segoe UI', Arial, sans-serif;
       background:#000; color:#fff; overflow:hidden;
     }
-    /* Màn hình chờ */
+
     .enter-screen{
       position:fixed; inset:0;
       display:flex; align-items:center; justify-content:center;
@@ -40,7 +40,7 @@
       box-shadow:0 0 30px var(--gold1);
     }
 
-    /* Banner nền */
+
     .banner{
       position:fixed; inset:0; z-index:0; overflow:hidden;
     }
@@ -52,7 +52,7 @@
       filter:brightness(.6);
     }
 
-    /* Nội dung bio */
+    
     .info-wrap{
       position:relative; z-index:1;
       display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -114,18 +114,18 @@
 </head>
 <body>
 
-<!-- Màn hình chờ -->
+
 <div class="enter-screen" id="enterScreen">
   <h1 style="color:var(--gold1); font-size:40px;">Welcome</h1>
   <button class="enter-btn" id="enterBtn">ENTER</button>
 </div>
 
-<!-- Banner video -->
+
 <div class="banner">
   <video src="static/banner.mp4" autoplay loop muted playsinline></video>
 </div>
 
-<!-- Nội dung Bio -->
+
 <div class="info-wrap" style="display:none;" id="bioContent">
   <div class="card">
     <div class="avatar">
@@ -140,7 +140,7 @@
   </div>
 </div>
 
-<!-- Nhạc -->
+
 <audio id="bgAudio" loop>
   <source src="static/music.mp3" type="audio/mpeg">
 </audio>
