@@ -1,41 +1,15 @@
 <!doctype html>
 <html lang="vi">
-\1
-
-<script>
-(function() {
-  document.addEventListener('keydown', e => {
-    if (e.key === "F12" ||
-        (e.ctrlKey && e.shiftKey && ["I","i","J","j","C","c"].includes(e.key)) ||
-        (e.ctrlKey && ["U","u","S","s"].includes(e.key))) {
-      e.preventDefault();
-    }
-  }, true);
-
-  document.addEventListener('contextmenu', e => e.preventDefault());
-
-  // Phát hiện mở DevTools
-  setInterval(function() {
-    const before = new Date();
-    debugger;
-    if (new Date() - before > 200) {
-      location.href = "about:blank";
-    }
-  }, 500);
-})();
-</script>
-
+<head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Bio — Nguyễn Trọng </title>
-
+  <title>Bio — Nguyễn Trọng</title>
 
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;900&family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
 
-
+  <!-- Three.js (giữ bản cũ tương thích) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
 
   <style>
     :root{
@@ -45,7 +19,7 @@
       --gold2:#ffb300;
       --accentA: #7c3aed;
       --accentB: #06b6d4;
-      --purple-main: #9b5cff; 
+      --purple-main: #9b5cff;
       --purple-deep: #5b1bd9;
       --purple-glow: rgba(155,92,255,0.18);
       --max-width: 980px;
@@ -61,15 +35,14 @@
       overflow:hidden;
     }
 
-    #vanta-bg { position:fixed; inset:0; z-index:0; }
-
+    /* -- Three.js background container -- */
+    #vanta-bg { position:fixed; inset:0; z-index:0; pointer-events:none; }
 
     .overlay {
       position:fixed; inset:0; z-index:1; pointer-events:none;
-      background: linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.55));
+      background: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.35));
       mix-blend-mode: overlay;
     }
-
 
     .wave-layer {
       position:fixed; inset:0; z-index:9; pointer-events:none; overflow:visible;
@@ -92,7 +65,6 @@
       100%{ transform: translate3d(-50%,-50%,-360px) scale(3.6) rotateX(0deg); opacity:0; filter: blur(30px) saturate(1); }
     }
 
-    /* Enter cinematic */
     .enter-screen{
       position:fixed; inset:0; z-index:12;
       display:flex; align-items:center; justify-content:center; flex-direction:column; gap:18px;
@@ -120,7 +92,6 @@
       100% { opacity:0; transform: scale(1.12) translateY(-40px); pointer-events:none; }
     }
 
-
     .wrap {
       position:relative; z-index:2; min-height:100vh;
       display:flex; align-items:center; justify-content:center; padding:48px 20px;
@@ -132,6 +103,8 @@
       box-shadow: 0 30px 90px rgba(2,6,23,0.7);
       display:flex; gap:26px; align-items:center; backdrop-filter: blur(8px);
       border: 1px solid rgba(255,255,255,0.03);
+      position:relative;
+      overflow:hidden;
     }
 
     .left {
@@ -139,44 +112,54 @@
       position:relative;
     }
 
-
+    /* --- Avatar wrapper updated so avatar + ring + halo are centered --- */
     .avatar-wrap {
       position:relative; width:220px; height:220px; border-radius:999px;
-      display:grid; place-items:center;
+      display:flex; align-items:center; justify-content:center;
       transform-style:preserve-3d;
       transition: transform 200ms ease;
       cursor:pointer;
+      z-index:3;
     }
 
     .avatar-ring {
-      position:absolute; inset:-10px; border-radius:999px;
+      position:absolute; inset:-12px; border-radius:999px;
       background: conic-gradient(from 0deg, var(--accentA), var(--accentB), #8b5cf6, #06b6d4, var(--accentA));
       filter: blur(10px);
-      opacity:0.9;
-      z-index:0;
+      opacity:0.95;
+      z-index:1;
       animation: ringRotate 8s linear infinite;
-      mask: radial-gradient(farthest-side, black 60%, transparent 100%);
-      -webkit-mask: radial-gradient(farthest-side, black 60%, transparent 100%);
       pointer-events:none;
+      box-shadow: 0 30px 60px rgba(6,26,37,0.45);
+      border:1px solid rgba(255,255,255,0.02);
     }
     @keyframes ringRotate { to { transform: rotate(360deg); } }
 
-
     .avatar-halo {
-      position:absolute; inset:6px; border-radius:999px; z-index:1;
+      position:absolute; inset:6px; border-radius:999px; z-index:2;
       background: radial-gradient(circle at 30% 20%, rgba(124,58,237,0.28), rgba(6,182,212,0.12) 30%, transparent 60%);
       filter: blur(14px); pointer-events:none;
     }
 
-
     .avatar {
       width:200px; height:200px; border-radius:999px; overflow:hidden;
       border: 3px solid rgba(255,255,255,0.06);
-      z-index:2; background:#111; transform: translateZ(40px);
+      z-index:3; background:#111; transform: translateZ(40px);
       box-shadow: 0 20px 60px rgba(6,26,37,0.6), 0 0 30px rgba(124,58,237,0.06);
+      position:relative;
+      display:flex; align-items:center; justify-content:center;
     }
     .avatar img { width:100%; height:100%; object-fit:cover; display:block; }
 
+    .avatar-upload {
+      position:absolute; right:8px; bottom:8px; z-index:8;
+      width:42px; height:42px; border-radius:10px; display:grid; place-items:center;
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      border:1px solid rgba(255,255,255,0.04);
+      cursor:pointer;
+      box-shadow:0 8px 30px rgba(0,0,0,0.6);
+    }
+    .avatar-upload i { font-size:18px; color: #fff; }
 
     .badge {
       position:absolute; right:-6px; top:-6px; z-index:6;
@@ -186,10 +169,8 @@
       transform: translateZ(60px); border:1px solid rgba(255,255,255,0.06);
     }
 
-
     #avatar-canvas { position:absolute; inset: -30px; z-index:0; pointer-events:none; }
 
- 
     .right { flex:1; display:flex; flex-direction:column; gap:10px; padding:6px 12px; min-width:220px; }
     .username {
       font-family:'Montserrat',sans-serif; font-size:48px; font-weight:900;
@@ -198,8 +179,8 @@
       transform-style:preserve-3d;
       perspective:900px;
       display:inline-block;
+      min-height:64px;
     }
-
 
     .username .letter {
       display:inline-block;
@@ -208,7 +189,7 @@
       transform-style:preserve-3d;
       -webkit-transform-style:preserve-3d;
       will-change: transform, text-shadow, opacity;
-      transition: transform 420ms cubic-bezier(.2,.9,.3,1), text-shadow 420ms ease;
+      transition: transform 420ms cubic-bezier(.2,.9,.3,1), text-shadow 420ms ease, opacity 420ms ease;
       margin:0 1px;
       color:var(--purple-main);
       background: linear-gradient(180deg, var(--purple-main), var(--purple-deep));
@@ -218,60 +199,29 @@
         0 1px 0 rgba(255,255,255,0.02),
         0 6px 18px rgba(91,27,217,0.24),
         0 18px 40px rgba(12,8,28,0.65);
-      transform: translateZ(20px);
+      transform: translateZ(22px);
+      opacity:0;
     }
 
-    .username .letter::before,
-    .username .letter::after {
-      content: attr(data-char);
-      position:absolute;
-      left:0; top:0;
-      z-index:-1;
-      -webkit-text-stroke: 0;
-      color:transparent;
-      -webkit-background-clip:text;
-      background: linear-gradient(180deg, rgba(91,27,217,0.9), rgba(27,0,87,0.6));
-      -webkit-text-fill-color: transparent;
-      transform-origin:left top;
-      pointer-events:none;
+    .username .letter.in {
+      animation: letterIn 900ms cubic-bezier(.2,.9,.3,1) forwards;
     }
-    .username .letter::before {
-      transform: translate3d(6px,8px,-6px) scale(1);
-      filter: blur(6px) opacity(.28;
+    @keyframes letterIn {
+      0% { transform: translateY(24px) translateZ(6px) rotateX(6deg); opacity:0; filter: blur(6px); }
+      60% { transform: translateY(-6px) translateZ(28px) rotateX(-3deg); opacity:1; filter: blur(0px); }
+      100% { transform: translateY(0px) translateZ(22px) rotateX(0deg); opacity:1; filter: blur(0px); }
     }
-    .username .letter::after {
-      transform: translate3d(10px,14px,-14px) scale(1);
-      filter: blur(12px) opacity(.12);
-    }
-
-
-    .username .letter.float {
-      animation: floatLetter var(--float-dur, 4000ms) ease-in-out infinite;
-    }
-    @keyframes floatLetter {
-      0%{ transform: translate3d(0px,0px,18px) rotateX(2deg) }
-      50%{ transform: translate3d(0px,-8px,36px) rotateX(-2deg) }
-      100%{ transform: translate3d(0px,0px,18px) rotateX(2deg) }
-    }
-
-
-    .username.hovered .letter {
-      transition: transform 240ms cubic-bezier(.2,.9,.3,1), text-shadow 240ms ease;
-    }
-    .username.hovered .letter:hover {
-      transform: translateZ(60px) rotateX(-6deg) rotateY(6deg) scale(1.06);
-      text-shadow:
-        0 2px 0 rgba(255,255,255,0.03),
-        0 14px 40px rgba(91,27,217,0.34),
-        0 34px 80px rgba(12,8,28,0.75);
-    }
-
 
     .bio {
       font-size:18px; font-weight:600; color:rgba(255,255,255,0.92);
       line-height:1.5; min-height:54px;
+      opacity:0;
+      transform: translateY(6px);
     }
-
+    .bio.visible { animation: bioFade 800ms ease forwards; }
+    @keyframes bioFade {
+      to { opacity:1; transform: translateY(0); }
+    }
 
     .eq {
       display:flex; gap:6px; margin-top:6px; align-items:end; height:64px;
@@ -282,17 +232,16 @@
       box-shadow: 0 6px 20px rgba(6,182,212,0.12);
     }
 
-
     .socials { display:flex; gap:12px; margin-top:12px; flex-wrap:wrap; }
     .social {
       display:inline-flex; align-items:center; justify-content:center;
-      width:56px; height:56px; border-radius:12px; text-decoration:none; color:white;
+      width:82px; height:82px; border-radius:14px; text-decoration:none; color:white;
       background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
       border:1px solid rgba(255,255,255,0.03); transition: transform .18s ease, box-shadow .18s ease;
       box-shadow: 0 8px 30px rgba(6,26,37,0.6);
+      font-size:34px;
     }
-    .social:hover { transform:translateY(-6px); box-shadow: 0 18px 50px rgba(6,26,37,0.8), 0 0 30px rgba(124,58,237,0.12); }
-
+    .social:hover { transform:translateY(-6px) scale(1.06); box-shadow: 0 18px 50px rgba(6,26,37,0.8), 0 0 30px rgba(124,58,237,0.12); }
 
     @media(max-width:820px){
       .card { flex-direction:column; align-items:center; padding:22px; gap:18px; }
@@ -303,7 +252,6 @@
       .avatar { width:140px; height:140px; }
     }
 
-
     .float-anim { animation: floaty 6s ease-in-out infinite; }
     @keyframes floaty {
       0%{ transform: translateY(0px) }
@@ -311,30 +259,32 @@
       100%{ transform: translateY(0px) }
     }
 
-
-    .social {
-      width:70px !important;
-      height:70px !important;
-      font-size:32px !important;
-      border-radius:14px !important;
-    }
-    .social:hover {
-      transform: translateY(-6px) scale(1.08) !important;
-      box-shadow: 0 30px 80px rgba(0,162,255,0.12), 0 0 40px rgba(0,140,255,0.14) !important;
-      filter: saturate(1.05);
-    }
-
-    .__star {
+    .sparkle {
       position: fixed;
       pointer-events: none;
       border-radius: 50%;
+      background: white;
+      box-shadow: 0 0 10px rgba(255,255,255,0.6);
+      opacity: 0.85;
+      z-index: 6;
       transform: translate(-50%, -50%);
-      z-index: 9999;
       will-change: transform, opacity;
+      transition: opacity 600ms linear;
     }
 
+    .rotate-overlay {
+      position:fixed; inset:0; z-index:10000; display:none; align-items:center; justify-content:center;
+      background: linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.8));
+      color: #fff; text-align:center; padding:20px;
+      font-size:16px;
+    }
+    .rotate-overlay .hint { max-width:560px; opacity:0.95; }
+    @media (max-width:900px) and (orientation: portrait) {
+      .rotate-overlay { display:flex; }
+      .wrap { transform-origin: center center; transform: rotate(90deg) scale(calc( (100vh / 100vw) )); top:50%; left:50%; position:fixed; }
+    }
 
-    .card .__shine {
+    .__shine {
       position: absolute;
       top: -10%;
       left: -60%;
@@ -349,69 +299,8 @@
     }
     @keyframes __shineMove { to { left: 140%; } }
 
-  
-
-.social {
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  width:70px !important;
-  height:70px !important;
-  border-radius:12px;
-  text-decoration:none;
-  color:white;
-  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-  border:1px solid rgba(255,255,255,0.03);
-  box-shadow: 0 8px 30px rgba(6,26,37,0.6);
-  font-size: 28px !important;
-  transition: transform .18s ease, box-shadow .18s ease;
-}
-.social:hover {
-  transform:translateY(-6px) scale(1.1);
-  box-shadow: 0 18px 50px rgba(0, 162, 255, 0.8), 0 0 30px rgba(0, 140, 255, 0.5);
-}
-.star {
-  position: absolute;
-  background: white;
-  border-radius: 50%;
-  opacity: 0.8;
-  animation: fall 2s linear forwards;
-}
-@keyframes fall {
-  to { transform: translateY(100vh) translateX(var(--x-move)); opacity: 0; }
-}
-.wave {
-  position:absolute;
-  width:160px;
-  height:160px;
-  border-radius:50%;
-  transform-origin:center;
-  background: radial-gradient(circle, rgba(0,162,255,0.85), rgba(0,90,180,0.35) 40%, rgba(0,70,150,0.12) 60%, transparent 70%);
-  filter: blur(8px) saturate(1.2);
-  mix-blend-mode: screen;
-  pointer-events:none;
-  animation: waveExpand 1000ms cubic-bezier(.2,.9,.3,1) forwards;
-}
-@keyframes waveExpand {
-  0%{ transform: translate3d(-50%,-50%,0) scale(.28) rotateX(18deg); opacity:0.95; }
-  60%{ transform: translate3d(-50%,-50%,-140px) scale(1.6) rotateX(8deg); opacity:0.52; }
-  100%{ transform: translate3d(-50%,-50%,-360px) scale(3.6) rotateX(0deg); opacity:0; }
-}
-.shine {
-  position: absolute;
-  top:0;left:-75%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
-  transform: skewX(-25deg);
-  animation: shineMove 1.8s ease forwards;
-}
-@keyframes shineMove {
-  to { left: 125%; }
-}
-
-
-</style>
+    .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(1px,1px,1px,1px); white-space:nowrap; }
+  </style>
 </head>
 <body>
 
@@ -419,31 +308,39 @@
   <div class="overlay"></div>
   <div class="wave-layer" id="waveLayer" aria-hidden="true"></div>
 
-  <div class="enter-screen" id="enterScreen">
+  <div class="enter-screen" id="enterScreen" role="dialog" aria-modal="true" aria-label="Màn chào mừng">
     <div class="logo">Welcome to my Bio</div>
-    <div style="color:rgba(255,255,255,0.65); margin-top:6px">Lưu ý: dùng mobile thì xoay ngang màn hình</div>
+    <div style="color:rgba(255,255,255,0.65); margin-top:6px">Lưu ý: dùng mobile thì xoay ngang màn hình (màn hình sẽ tự xoay nội dung)</div>
     <button class="enter-btn" id="enterBtn">ENTER</button>
+  </div>
+
+  <div class="rotate-overlay" id="rotateOverlay" aria-hidden="true">
+    <div class="hint">
+      Để trải nghiệm tốt nhất trên điện thoại, xoay thiết bị sang ngang / landscape.<br>
+      Nếu bạn không thể xoay, trang sẽ cố gắng xoay nội dung thay bạn.
+    </div>
   </div>
 
   <div class="wrap" id="mainWrap" style="display:none;">
     <div class="card float-anim" role="region" aria-label="Bio card">
       <div class="left">
-        <canvas id="avatar-canvas" width="400" height="400"></canvas>
+        <canvas id="avatar-canvas" width="400" height="400" aria-hidden="true"></canvas>
 
-        <div class="avatar-ring"></div>
-        <div class="avatar-halo"></div>
-
+        <!-- avatar ring + halo moved INSIDE avatar-wrap để luôn căn chính giữa -->
         <div class="avatar-wrap" id="avatarWrap" title="Avatar">
+          <div class="avatar-ring" aria-hidden="true"></div>
+          <div class="avatar-halo" aria-hidden="true"></div>
+
           <div class="badge">Premium</div>
           <div class="avatar" id="avatar">
-            <img src="static/avatar.png" alt="avatar">
+            <img src="static/avatar.png" alt="avatar" id="avatarImg">
           </div>
-        </div>
 
+        </div>
 
         <div style="width:100%; display:flex; flex-direction:column; align-items:center; margin-top:8px;">
           <div style="font-size:12px; color:rgba(255,255,255,0.6);">Now playing</div>
-          <div class="eq" id="eq">
+          <div class="eq" id="eq" aria-hidden="true">
             <div class="bar" style="height:14%"></div>
             <div class="bar" style="height:22%"></div>
             <div class="bar" style="height:18%"></div>
@@ -461,15 +358,15 @@
       </div>
 
       <div class="right">
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <div class="username neon" id="username" data-shadow="NguyenTrongg" aria-live="polite"></div>
+        </div>
 
-        <div class="username neon" id="username" data-shadow="NguyenTrongg" aria-live="polite"></div>
-        <div class="bio" id="bioText"></div>
+        <div class="bio" id="bioText" aria-live="polite"></div>
 
         <div class="socials" id="socials">
-
-          <a class="social" href="https://www.facebook.com/NguyenTrong6565" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-          <a class="social" href="https://discord.gg/bpZqKr2EWQ" target="_blank" rel="noopener noreferrer" aria-label="Discord"><i class="fab fa-discord"></i></a>
-
+          <a class="social" href="https://www.facebook.com/NguyenTrong6565" target="_blank" rel="noopener noreferrer" aria-label="Facebook" id="facebook"><i class="fab fa-facebook-f"></i></a>
+          <a class="social" href="https://discord.gg/bpZqKr2EWQ" target="_blank" rel="noopener noreferrer" aria-label="Discord" id="discord"><i class="fab fa-discord"></i></a>
         </div>
 
         <div style="margin-top:auto; color:rgba(255,255,255,0.45); font-size:13px;">
@@ -479,91 +376,276 @@
     </div>
   </div>
 
-
   <audio id="bgAudio" loop crossorigin="anonymous">
     <source src="static/music.mp3" type="audio/mpeg">
   </audio>
 
   <script>
+    // ---------- Galaxy 3D (Three.js) ----------
+    (function initGalaxy(){
+      const container = document.getElementById('vanta-bg');
+      // create canvas-fullscreen renderer
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setPixelRatio(window.devicePixelRatio || 1);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.domElement.style.position = 'absolute';
+      renderer.domElement.style.top = '0';
+      renderer.domElement.style.left = '0';
+      renderer.domElement.style.width = '100%';
+      renderer.domElement.style.height = '100%';
+      renderer.domElement.style.zIndex = '0';
+      container.appendChild(renderer.domElement);
 
-    VANTA.NET({
-      el: "#vanta-bg",
-      mouseControls: true,
-      touchControls: true,
-      minHeight: 200.00,
-      minWidth: 200.00,
-      scale: 1.0,
-      scaleMobile: 1.0,
-      backgroundColor: 0x05060a,
-      color: 0x7c3aed,
-      maxDistance: 22.00,
-      showDots: true
-    });
+      const scene = new THREE.Scene();
+      // slightly bluish transparent fog for depth
+      scene.fog = new THREE.FogExp2(0x05060a, 0.0008);
 
+      const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 3000);
+      camera.position.set(0, 120, 420);
+
+      // Lights (soft)
+      const hemi = new THREE.HemisphereLight(0x8888ff, 0x080820, 0.85);
+      scene.add(hemi);
+
+      // Create galaxy points (spiral)
+      const parameters = {
+        count: 65000,        // particles
+        arms: 4,             // spiral arms
+        radius: 600,
+        randomness: 0.55,
+        randomnessPower: 1.8,
+        insideColor: new THREE.Color(0xfff7e6),
+        outsideColor: new THREE.Color(0x6b3cff),
+      };
+
+      const geometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(parameters.count * 3);
+      const colors = new Float32Array(parameters.count * 3);
+      const sizes = new Float32Array(parameters.count);
+
+      const colorInside = parameters.insideColor;
+      const colorOutside = parameters.outsideColor;
+
+      for(let i = 0; i < parameters.count; i++){
+        const i3 = i * 3;
+
+        const radius = Math.pow(Math.random(), 1.2) * parameters.radius;
+        const spinAngle = radius * 0.12;
+        const branch = i % parameters.arms;
+        const branchAngle = (branch / parameters.arms) * Math.PI * 2;
+
+        // spread from arm center
+        const randomX = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+        const randomY = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius * 0.25;
+        const randomZ = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+
+        const totalAngle = branchAngle + spinAngle;
+
+        positions[i3 + 0] = Math.cos(totalAngle) * radius + randomX;
+        positions[i3 + 1] = randomY * 0.35; // thinner galaxy
+        positions[i3 + 2] = Math.sin(totalAngle) * radius + randomZ * 0.25;
+
+        // color gradient by radius
+        const t = radius / parameters.radius;
+        const mixedColor = colorInside.clone().lerp(colorOutside, t * 0.92 + 0.04);
+        colors[i3 + 0] = mixedColor.r;
+        colors[i3 + 1] = mixedColor.g;
+        colors[i3 + 2] = mixedColor.b;
+
+        // size variation
+        sizes[i] = 2.2 + Math.random() * 3.6 * (1 - t) ;
+      }
+
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+      geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+      // star sprite texture for nicer points (generate tiny canvas)
+      const sprite = (function () {
+        const c = document.createElement('canvas');
+        c.width = 64; c.height = 64;
+        const ctx = c.getContext('2d');
+        const grad = ctx.createRadialGradient(32,32,2,32,32,32);
+        grad.addColorStop(0, 'rgba(255,255,255,1)');
+        grad.addColorStop(0.2, 'rgba(255,240,220,0.85)');
+        grad.addColorStop(0.4, 'rgba(200,160,255,0.6)');
+        grad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0,0,64,64);
+        const tex = new THREE.CanvasTexture(c);
+        return tex;
+      })();
+
+      const material = new THREE.PointsMaterial({
+        size: 6,
+        vertexColors: true,
+        map: sprite,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        sizeAttenuation: true,
+      });
+
+      const points = new THREE.Points(geometry, material);
+      scene.add(points);
+
+      // add a soft glowing core (bloom-like)
+      const coreGeom = new THREE.SphereBufferGeometry(18, 32, 32);
+      const coreMat = new THREE.MeshBasicMaterial({
+        color: 0xfff6d9,
+        transparent: true,
+        opacity: 0.95,
+        blending: THREE.AdditiveBlending
+      });
+      const core = new THREE.Mesh(coreGeom, coreMat);
+      scene.add(core);
+
+      // slight particle cloud near center for depth
+      const cloudGeom = new THREE.BufferGeometry();
+      const cloudCount = 16000;
+      const cloudPos = new Float32Array(cloudCount * 3);
+      const cloudCol = new Float32Array(cloudCount * 3);
+      for(let i=0;i<cloudCount;i++){
+        const i3 = i*3;
+        const r = Math.random() * 70;
+        const ang = Math.random() * Math.PI * 2;
+        cloudPos[i3+0] = Math.cos(ang) * r * (Math.random()*0.9);
+        cloudPos[i3+1] = (Math.random()-0.5) * 25;
+        cloudPos[i3+2] = Math.sin(ang) * r * (Math.random()*0.9);
+        const col = new THREE.Color().setHSL(0.66 + Math.random()*0.06, 0.7, 0.6 - Math.random()*0.2);
+        cloudCol[i3+0] = col.r; cloudCol[i3+1] = col.g; cloudCol[i3+2] = col.b;
+      }
+      cloudGeom.setAttribute('position', new THREE.BufferAttribute(cloudPos, 3));
+      cloudGeom.setAttribute('color', new THREE.BufferAttribute(cloudCol, 3));
+      const cloudMat = new THREE.PointsMaterial({
+        size: 18,
+        map: sprite,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        vertexColors: true,
+        opacity: 0.35,
+        sizeAttenuation: true
+      });
+      const cloudPoints = new THREE.Points(cloudGeom, cloudMat);
+      scene.add(cloudPoints);
+
+      // subtle orbiting dust rings (thin)
+      const ringGeom = new THREE.RingBufferGeometry(220, 260, 512);
+      const ringMat = new THREE.MeshBasicMaterial({
+        color: 0x4d2aff,
+        transparent: true,
+        opacity: 0.035,
+        side: THREE.DoubleSide,
+        blending: THREE.AdditiveBlending
+      });
+      const ring = new THREE.Mesh(ringGeom, ringMat);
+      ring.rotation.x = Math.PI * 0.5;
+      ring.position.y = -18;
+      scene.add(ring);
+
+      // handle resize
+      window.addEventListener('resize', onWindowResize);
+      function onWindowResize(){
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }
+
+      // subtle motion & parallax on mouse
+      let mouseX = 0, mouseY = 0;
+      document.addEventListener('mousemove', (e) => {
+        mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+        mouseY = (e.clientY / window.innerHeight) * 2 - 1;
+      });
+
+      // animation
+      const clock = new THREE.Clock();
+      function animate(){
+        const t = clock.getElapsedTime();
+        // rotate whole galaxy slowly
+        points.rotation.y = t * 0.02;
+        cloudPoints.rotation.y = -t * 0.01;
+        ring.rotation.z = t * 0.004;
+        core.rotation.y = t * 0.03;
+
+        // subtle parallax camera position
+        camera.position.x += (mouseX * 40 - camera.position.x) * 0.02;
+        camera.position.y += (-mouseY * 30 + 20 - camera.position.y) * 0.02;
+        camera.lookAt(0, 0, 0);
+
+        renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+      }
+      animate();
+
+      // Expose for dev if needed:
+      window._GALAXY = { renderer, scene, camera };
+    })();
+    // ---------- end Galaxy ----------
+
+    // ---------- Existing UI & interactions (kept mostly unchanged) ----------
     const enterBtn = document.getElementById('enterBtn');
     const enterScreen = document.getElementById('enterScreen');
     const mainWrap = document.getElementById('mainWrap');
     const bgAudio = document.getElementById('bgAudio');
     const usernameEl = document.getElementById('username');
     const waveLayer = document.getElementById('waveLayer');
+    const rotateOverlay = document.getElementById('rotateOverlay');
+    const avatarFile = document.getElementById('avatarFile');
+    const avatarImg = document.getElementById('avatarImg');
 
-
+    // **** Content (you can change these) ****
+    const displayName = 'Nguyễn Trọng'; // tên hiển thị (3D tím)
     const bioString = "Anh Trọng đẹp trai chim dài, còn em đóng vai người chồng bất lực nhìn vợ mình lên giường ứ ừ với anh Trọng 1 đêm đầy lãng mạn |";
-    const bioText = document.getElementById('bioText');
-
+    // ***************************************
 
     function render3DName(text){
-
       usernameEl.innerHTML = '';
       const frag = document.createDocumentFragment();
-
       const arr = Array.from(text);
       arr.forEach((ch, idx) => {
         const span = document.createElement('span');
         span.className = 'letter';
         span.setAttribute('data-char', ch === ' ' ? '\u00A0' : ch);
         span.textContent = ch === ' ' ? '\u00A0' : ch;
-
-        const dur = 3600 + Math.floor(Math.random()*2200);
-        span.style.setProperty('--float-dur', dur+'ms');
-
-        if(ch.trim() !== '' && Math.random() > 0.18) span.classList.add('float');
-
-        const tz = 16 + Math.floor(Math.random()*36); // 16..52
-        const rx = -6 + Math.random()*12; // -6..6
+        const delay = 80 * idx;
+        span.style.animationDelay = `${delay}ms`;
+        if(ch.trim() !== '' && Math.random() > 0.22) span.classList.add('float-anim');
+        const tz = 20 + Math.floor(Math.random()*28);
+        const rx = -6 + Math.random()*12;
         const ry = -6 + Math.random()*12;
         span.style.transform = `translateZ(${tz}px) rotateX(${rx}deg) rotateY(${ry}deg)`;
         frag.appendChild(span);
       });
       usernameEl.appendChild(frag);
+      requestAnimationFrame(()=> {
+        const letters = usernameEl.querySelectorAll('.letter');
+        letters.forEach((l,i) => {
+          setTimeout(()=> l.classList.add('in'), i*22);
+        });
+      });
     }
-
 
     function spawnWave(clientX, clientY){
       const el = document.createElement('div');
       el.className = 'wave';
-      // position relative to viewport
       el.style.left = clientX + 'px';
       el.style.top = clientY + 'px';
       waveLayer.appendChild(el);
-
       el.addEventListener('animationend', ()=> el.remove());
     }
 
-
     let lastWaveAt = 0;
     document.addEventListener('mousemove', e => {
-
       const now = Date.now();
       if(now - lastWaveAt < 220) return;
       lastWaveAt = now;
       spawnWave(e.clientX, e.clientY);
-
       applyPointer3DEffect(e.clientX, e.clientY);
     });
 
     document.addEventListener('click', e => {
-
       const large = document.createElement('div');
       large.className = 'wave';
       large.style.width = '260px';
@@ -574,24 +656,20 @@
       large.style.filter = 'blur(6px) saturate(1.3)';
       waveLayer.appendChild(large);
       large.addEventListener('animationend', ()=> large.remove());
-
       spawnBurst(e.clientX, e.clientY);
     });
-
 
     function applyPointer3DEffect(cx, cy){
       const rect = usernameEl.getBoundingClientRect();
       if(rect.width === 0) return;
       const centerX = rect.left + rect.width/2;
       const centerY = rect.top + rect.height/2;
-      const dx = (cx - centerX) / rect.width; 
+      const dx = (cx - centerX) / rect.width;
       const dy = (cy - centerY) / rect.height;
-
       usernameEl.style.transform = `perspective(900px) rotateX(${(-dy*6).toFixed(2)}deg) rotateY(${(dx*8).toFixed(2)}deg)`;
-
       const letters = usernameEl.querySelectorAll('.letter');
       letters.forEach((l, i) => {
-        const offset = (i - letters.length/2) * 0.26;
+        const offset = (i - letters.length/2) * 0.22;
         const tz = 18 + offset * 6 - dx*14;
         const rx = -4 + dy*8 + Math.sin(i*0.6)*2;
         const ry = dx*6 + Math.cos(i*0.4)*2;
@@ -599,95 +677,14 @@
       });
     }
 
-
     document.addEventListener('mouseleave', () => {
       usernameEl.style.transform = '';
       const letters = usernameEl.querySelectorAll('.letter');
-      letters.forEach((l) => {
-
-        l.style.transform = l.style.transform.replace(/translateZ\([^)]+\)/,'translateZ(22px)');
-      });
+      letters.forEach((l) => { l.style.transform = l.style.transform.replace(/translateZ\([^)]+\)/,'translateZ(22px)'); });
     });
-
-
-    window.setVipProfile = function({name, bio, avatarPath}){
-      if(name) {
-        render3DName(name);
-        document.getElementById('username').setAttribute('data-shadow', name);
-      }
-      if(bio) { document.getElementById('bioText').textContent = bio; }
-      if(avatarPath) { document.querySelector('#avatar img').src = avatarPath; }
-    };
-
-
-    render3DName('NguyenTrongg');
-
-
-    function initialEntranceWave(){
-      const cx = window.innerWidth/2;
-      const cy = window.innerHeight/2;
-
-      spawnWave(cx, cy);
-      setTimeout(()=> spawnWave(cx+120, cy-80), 160);
-      setTimeout(()=> spawnWave(cx-160, cy+60), 320);
-    }
-
-    enterBtn.addEventListener('click', async () => {
-      enterScreen.classList.add('exit');
-      setTimeout(()=>{ enterScreen.style.display='none'; mainWrap.style.display='flex'; }, 800);
-
-
-      setTimeout(initialEntranceWave, 240);
-
-
-      try {
-        await bgAudio.play();
-        fadeInAudio(bgAudio, 0.0, 0.9, 1800);
-        initAudioReactive();
-      } catch (e) {
-
-        console.log('Audio autoplay blocked', e);
-      }
-
-      let i=0;
-      function typeWriter(){ if(i < bioString.length){ bioText.textContent += bioString.charAt(i++); setTimeout(typeWriter, 26); } }
-      setTimeout(typeWriter, 420);
-    });
-
-    function fadeInAudio(audio, from, to, ms){
-      audio.volume = from;
-      const step = (to - from) / (ms/60);
-      const it = setInterval(()=>{ audio.volume = Math.min(to, audio.volume + step); if(audio.volume >= to) clearInterval(it); }, 60);
-    }
-
-    const avatarWrap = document.getElementById('avatarWrap');
-    const avatar = document.getElementById('avatar');
-
-    avatarWrap.addEventListener('mousemove', (e) => {
-      const rect = avatarWrap.getBoundingClientRect();
-      const px = (e.clientX - rect.left) / rect.width;
-      const py = (e.clientY - rect.top) / rect.height;
-      const rx = (py - 0.5) * 12; 
-      const ry = (px - 0.5) * -18; 
-      avatarWrap.style.transform = `perspective(700px) rotateX(${rx}deg) rotateY(${ry}deg) scale(1.03)`;
-      // subtle brightness change based on pointer
-      avatar.style.filter = `brightness(${1 + Math.abs(px-0.5) * 0.12}) saturate(${1 + Math.abs(py-0.5) * 0.06})`;
-    });
-    avatarWrap.addEventListener('mouseleave', () => {
-      avatarWrap.style.transform = 'perspective(700px) rotateX(0) rotateY(0) scale(1)';
-      avatar.style.filter = 'brightness(1) saturate(1)';
-    });
-
-
-    avatarWrap.addEventListener('click', (e) => {
-      pulseAvatar();
-      spawnBurst(e.clientX, e.clientY);
-      // also spawn a wave
-      spawnWave(e.clientX, e.clientY);
-    });
-
 
     function pulseAvatar(){
+      const avatar = document.getElementById('avatar');
       avatar.style.transition = 'transform 220ms cubic-bezier(.2,.8,.2,1)';
       avatar.style.transform = 'scale(1.06)';
       setTimeout(()=> avatar.style.transform = 'scale(1)', 220);
@@ -725,8 +722,7 @@
       for(let i=0;i<34;i++) spawnParticle(x, y);
     }
 
-
-    setInterval(()=>{
+    setInterval(()=> {
       const rect = canvas.getBoundingClientRect();
       const cx = rect.width*DPR/2; const cy = rect.height*DPR/2;
       if(Math.random() < 0.6) spawnParticle(cx + (Math.random()-0.5)*40*DPR, cy + (Math.random()-0.5)*40*DPR);
@@ -738,7 +734,7 @@
         const p = particles[i];
         p.x += p.vx * DPR;
         p.y += p.vy * DPR;
-        p.vy += 0.06 * DPR; 
+        p.vy += 0.06 * DPR;
         p.life--;
         ctx.beginPath();
         const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r*6*DPR);
@@ -763,12 +759,7 @@
       const bufferLength = analyser.frequencyBinCount;
       const dataArray = new Uint8Array(bufferLength);
 
-      try {
-        sourceNode = audioCtx.createMediaElementSource(bgAudio);
-      } catch(e) {
-        console.warn('Cannot create media source: ', e);
-        return;
-      }
+      try { sourceNode = audioCtx.createMediaElementSource(bgAudio); } catch(e) { console.warn('Cannot create media source: ', e); return; }
       sourceNode.connect(analyser);
       analyser.connect(audioCtx.destination);
 
@@ -783,7 +774,6 @@
           bars[i].style.height = `${h}%`;
           bars[i].style.opacity = 0.6 + (h/200);
         }
-
         const bass = dataArray[2] + dataArray[3] + dataArray[4];
         const scale = 1 + Math.min(0.18, bass/800);
         document.querySelector('.avatar-ring').style.transform = `scale(${scale})`;
@@ -792,72 +782,85 @@
       renderFrame();
     }
 
-
-    document.body.addEventListener('click', async function oneTapEnable(){
-      if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
-      if(bgAudio.paused) {
-        try{ await bgAudio.play(); fadeInAudio(bgAudio, 0, 0.9, 1200); }catch(e){}
+    const bioText = document.getElementById('bioText');
+    function typewriterText(str, speed = 28){
+      bioText.textContent = '';
+      let i=0;
+      function step(){
+        if(i < str.length){
+          bioText.textContent += str.charAt(i++);
+          setTimeout(step, speed);
+        } else {
+          bioText.classList.add('visible');
+        }
       }
-      document.body.removeEventListener('click', oneTapEnable);
-    });
-
-
-    function isLowPower(){
-      // cheap heuristics
-      const mq = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if(mq) return true;
-      if(window.innerWidth < 420) return false; 
-      return false;
+      setTimeout(step, 360);
     }
 
+    function initialEntranceWave(){
+      const cx = window.innerWidth/2;
+      const cy = window.innerHeight/2;
+      spawnWave(cx, cy);
+      setTimeout(()=> spawnWave(cx+120, cy-80), 160);
+      setTimeout(()=> spawnWave(cx-160, cy+60), 320);
+    }
 
-    setTimeout(()=> spawnBurst(canvas.getBoundingClientRect().left + canvas.width/2, canvas.getBoundingClientRect().top + canvas.height/2), 1200);
+    enterBtn.addEventListener('click', async () => {
+      enterScreen.classList.add('exit');
+      setTimeout(()=>{ enterScreen.style.display='none'; mainWrap.style.display='flex'; }, 800);
+      setTimeout(initialEntranceWave, 240);
 
-    usernameEl.addEventListener('mouseenter', ()=> usernameEl.classList.add('hovered'));
-    usernameEl.addEventListener('mouseleave', ()=> usernameEl.classList.remove('hovered'));
+      try {
+        await bgAudio.play();
+        fadeInAudio(bgAudio, 0.0, 0.9, 1800);
+        initAudioReactive();
+      } catch (e) {
+        console.log('Audio autoplay blocked', e);
+      }
 
-    window.setVipProfile = window.setVipProfile || function({name, bio, avatarPath}) {
-      if(name) { render3DName(name); document.getElementById('username').setAttribute('data-shadow', name); }
-      if(bio) { document.getElementById('bioText').textContent = bio; }
-      if(avatarPath) { document.querySelector('#avatar img').src = avatarPath; }
-    };
+      render3DName(displayName);
+      typewriterText(bioString, 28);
+      spawnPersistentSparkles(80);
+    });
 
+    function fadeInAudio(audio, from, to, ms){
+      audio.volume = from;
+      const step = (to - from) / (ms/60);
+      const it = setInterval(()=>{ audio.volume = Math.min(to, audio.volume + step); if(audio.volume >= to) clearInterval(it); }, 60);
+    }
 
-    (function protectShortcuts(){
-      // prevent right click (already a common approach)
-      document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
-
-
-      document.addEventListener('keydown', function(e){
-        // F12
-        if (e.key === 'F12') { e.preventDefault(); return; }
-        // Ctrl+Shift+I / J / C
-        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) {
-          e.preventDefault(); return;
-        }
-        // Ctrl+U, Ctrl+S (view-source / save)
-        if (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.key === 'S' || e.key === 's')) {
-          e.preventDefault(); return;
-        }
-      }, {capture:true});
-    })();
-
+    const avatarWrap = document.getElementById('avatarWrap');
+    avatarWrap.addEventListener('mousemove', (e) => {
+      const rect = avatarWrap.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / rect.width;
+      const py = (e.clientY - rect.top) / rect.height;
+      const rx = (py - 0.5) * 12;
+      const ry = (px - 0.5) * -18;
+      avatarWrap.style.transform = `perspective(700px) rotateX(${rx}deg) rotateY(${ry}deg) scale(1.03)`;
+      document.getElementById('avatar').style.filter = `brightness(${1 + Math.abs(px-0.5) * 0.12}) saturate(${1 + Math.abs(py-0.5) * 0.06})`;
+    });
+    avatarWrap.addEventListener('mouseleave', () => {
+      avatarWrap.style.transform = 'perspective(700px) rotateX(0) rotateY(0) scale(1)';
+      document.getElementById('avatar').style.filter = 'brightness(1) saturate(1)';
+    });
+    avatarWrap.addEventListener('click', (e) => {
+      pulseAvatar();
+      spawnBurst(e.clientX, e.clientY);
+      spawnWave(e.clientX, e.clientY);
+    });
 
     (function attachSocialExplosions(){
       const socials = document.querySelectorAll('.socials a.social');
       socials.forEach(a => {
         a.addEventListener('click', function(ev){
           ev.preventDefault();
-          // get center coords
           const r = a.getBoundingClientRect();
           const cx = r.left + r.width/2;
           const cy = r.top + r.height/2;
           spawnExplosionVisual(cx, cy);
-          // brief scale pop
           a.style.transition = 'transform .22s ease';
           a.style.transform = 'scale(0.95)';
           setTimeout(()=> a.style.transform = '', 220);
-          // open link after short delay so explosion visible
           const href = a.href;
           setTimeout(()=> {
             try { window.open(href, '_blank', 'noopener'); } catch(e){ window.location.href = href; }
@@ -869,306 +872,168 @@
         const count = 20;
         for (let i=0;i<count;i++){
           const el = document.createElement('div');
-          el.className = '__star';
-          const size = Math.random()*10 + 6;
+          el.className = 'sparkle';
+          const size = Math.random()*8 + 4;
           el.style.width = el.style.height = size + 'px';
           el.style.left = x + 'px';
           el.style.top = y + 'px';
-          el.style.background = `hsl(${Math.random()*360}, 80%, ${50 + Math.random()*15}%)`;
+          el.style.opacity = 1;
           document.body.appendChild(el);
-          // animate: random direction
           const angle = Math.random()*Math.PI*2;
-          const dist = 60 + Math.random()*220;
+          const dist = 40 + Math.random()*160;
           const dx = Math.cos(angle)*dist;
-          const dy = Math.sin(angle)*dist - (Math.random()*60);
+          const dy = Math.sin(angle)*dist - (Math.random()*40);
           el.animate([
             { transform: 'translate(0,0) scale(1)', opacity: 1 },
-            { transform: `translate(${dx}px, ${dy}px) scale(0.6)`, opacity: 0 }
+            { transform: `translate(${dx}px, ${dy}px) scale(0.3)`, opacity: 0 }
           ], {
-            duration: 700 + Math.random()*600,
+            duration: 600 + Math.random()*700,
             easing: 'cubic-bezier(.2,.9,.3,1)'
           });
-          setTimeout(()=> el.remove(), 1400);
+          setTimeout(()=> el.remove(), 1300);
         }
       }
     })();
 
+    function spawnExplosion(x, y) {
+      for (let i = 0; i < 20; i++) {
+        const p = document.createElement("div");
+        p.classList.add("sparkle");
+        p.style.width = p.style.height = Math.random() * 6 + 4 + "px";
+        p.style.left = x + "px";
+        p.style.top = y + "px";
+        p.style.background = "white";
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 2000);
+      }
+    }
+
+    function spawnBurst(clientX, clientY){
+      const rect = canvas.getBoundingClientRect();
+      const x = (clientX - rect.left) * DPR;
+      const y = (clientY - rect.top) * DPR;
+      for(let i=0;i<26;i++) spawnParticle(x, y);
+    }
+
+    let sparkleInterval;
+    function spawnPersistentSparkles(n = 30){
+      if(sparkleInterval) clearInterval(sparkleInterval);
+      for(let i=0;i<n;i++) createFloatingSparkle();
+      sparkleInterval = setInterval(()=> {
+        createFloatingSparkle();
+      }, 600);
+    }
+
+    function createFloatingSparkle(){
+      const el = document.createElement('div');
+      el.className = 'sparkle';
+      const size = Math.random()*4 + 3;
+      el.style.width = el.style.height = size + 'px';
+      el.style.left = Math.random()*window.innerWidth + 'px';
+      el.style.top = Math.random()*window.innerHeight + 'px';
+      el.style.opacity = 0;
+      el.style.background = 'linear-gradient(180deg, rgba(255,255,255,1), rgba(220,240,255,0.9))';
+      el.style.boxShadow = '0 0 10px rgba(255,255,255,0.9)';
+      document.body.appendChild(el);
+
+      const dx = (Math.random()*200 - 100);
+      const dy = (Math.random()*140 - 70);
+      const dur = 1800 + Math.random()*2200;
+
+      el.animate([
+        { opacity: 0, transform: 'translate(0,0) scale(0.8)' },
+        { opacity: 0.9, transform: `translate(${dx/3}px, ${dy/3}px) scale(1)` },
+        { opacity: 0, transform: `translate(${dx}px, ${dy}px) scale(0.6)` }
+      ], {
+        duration: dur,
+        easing: 'linear',
+        fill: 'forwards'
+      });
+      setTimeout(()=> el.remove(), dur + 90);
+    }
+
+    function checkOrientationOverlay(){
+      const isPortrait = window.matchMedia('(orientation: portrait)').matches && window.innerWidth < 900;
+      if(isPortrait){
+        rotateOverlay.style.display = 'flex';
+      } else {
+        rotateOverlay.style.display = 'none';
+      }
+    }
+    window.addEventListener('resize', checkOrientationOverlay);
+    window.addEventListener('orientationchange', checkOrientationOverlay);
+    checkOrientationOverlay();
+
+    // avatar upload (ensure input exists in DOM if you add it later)
+    // right now original markup referenced #avatarFile & #avatarUpload but not present; keep handlers safe
+    try {
+      const avatarUploadLabel = document.getElementById('avatarUpload');
+      const avatarFileInput = document.getElementById('avatarFile');
+      if(avatarUploadLabel && avatarFileInput){
+        avatarUploadLabel.addEventListener('click', ()=> avatarFileInput.click());
+        avatarFileInput.addEventListener('change', (evt) => {
+          const f = evt.target.files && evt.target.files[0];
+          if(!f) return;
+          const reader = new FileReader();
+          reader.onload = function(e){
+            avatarImg.src = e.target.result;
+            pulseAvatar();
+          };
+          reader.readAsDataURL(f);
+        });
+      }
+    } catch(e){/* safe */ }
+
+    (function protectShortcuts(){
+      document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+      document.addEventListener('keydown', function(e){
+        if (e.key === 'F12') { e.preventDefault(); return; }
+        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) {
+          e.preventDefault(); return;
+        }
+        if (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.key === 'S' || e.key === 's')) {
+          e.preventDefault(); return;
+        }
+      }, {capture:true});
+    })();
 
     (function attachEnterEffects(){
       const enter = document.getElementById('enterBtn');
       enter.addEventListener('click', function(){
-        
-        spawnBlueWave(window.innerWidth/2, window.innerHeight/2);
-        setTimeout(()=> spawnBlueWave(window.innerWidth/2 + 140, window.innerHeight/2 - 80), 140);
-        setTimeout(()=> spawnBlueWave(window.innerWidth/2 - 160, window.innerHeight/2 + 60), 300);
-        // spawn falling stars
-        spawnFallingStars(28);
-        // shine card
-        const card = document.querySelector('.card');
-        if(card){
-          const s = document.createElement('div');
-          s.className = '__shine';
-          card.appendChild(s);
-          setTimeout(()=> s.remove(), 1200);
-        }
+        setTimeout(()=> spawnBlueWave(window.innerWidth/2, window.innerHeight/2), 280);
+        setTimeout(()=> spawnBlueWave(window.innerWidth/2 + 140, window.innerHeight/2 - 80), 420);
+        setTimeout(()=> spawnBlueWave(window.innerWidth/2 - 160, window.innerHeight/2 + 60), 620);
       });
 
       function spawnBlueWave(cx, cy){
         const el = document.createElement('div');
         el.className = 'wave';
-        // override color to blue
-        el.style.background = 'radial-gradient(circle, rgba(0,162,255,0.9), rgba(0,90,180,0.38) 40%, rgba(0,70,150,0.12) 60%, transparent 75%)';
+        el.style.background = 'radial-gradient(circle, rgba(255,255,255,0.95), rgba(200,200,255,0.38) 40%, rgba(200,200,255,0.12) 60%, transparent 75%)';
         el.style.left = cx + 'px';
         el.style.top = cy + 'px';
         el.style.filter = 'blur(6px) saturate(1.05)';
-        el.style.boxShadow = '0 30px 80px rgba(0,94,180,0.18)';
+        el.style.boxShadow = '0 30px 80px rgba(200,200,255,0.08)';
         waveLayer.appendChild(el);
         el.addEventListener('animationend', ()=> el.remove());
       }
-
-      function spawnFallingStars(n){
-        for (let i=0;i<n;i++){
-          const star = document.createElement('div');
-          star.className = '__star';
-          const size = 2 + Math.random()*5;
-          star.style.width = star.style.height = size + 'px';
-          star.style.left = (Math.random()*window.innerWidth) + 'px';
-          star.style.top = (-20 - Math.random()*40) + 'px';
-          star.style.background = `linear-gradient(180deg, rgba(255,255,255,1), rgba(180,220,255,0.9))`;
-          document.body.appendChild(star);
-          const fallDist = window.innerHeight + 200 + Math.random()*200;
-          const xMove = (Math.random()*300 - 150);
-          star.animate([
-            { transform: 'translate(0,0) rotate(0deg)', opacity:1 },
-            { transform: `translate(${xMove}px, ${fallDist}px) rotate(${Math.random()*360}deg)`, opacity:0 }
-          ], {
-            duration: 1200 + Math.random()*1000,
-            easing: 'cubic-bezier(.2,.8,.2,1)'
-          });
-          setTimeout(()=> star.remove(), 2600);
-        }
-      }
     })();
 
-
-    function shineCardOnce(){
-      const card = document.querySelector('.card');
-      if(!card) return;
-      const s = document.createElement('div');
-      s.className = '__shine';
-      card.appendChild(s);
-      setTimeout(()=> s.remove(), 1200);
-    }
-
-
-    window.__vipExtras = {
-      shineCard: shineCardOnce
+    window.setVipProfile = function({name, bio, avatarPath}){
+      if(name) {
+        render3DName(name);
+        document.getElementById('username').setAttribute('data-shadow', name);
+      }
+      if(bio) { typewriterText(bio, 24); }
+      if(avatarPath) { document.querySelector('#avatar img').src = avatarPath; }
     };
 
+    render3DName(displayName);
+
     window.addEventListener('load', ()=> {
+      setTimeout(()=> spawnBurst(canvas.getBoundingClientRect().left + canvas.width/2, canvas.getBoundingClientRect().top + canvas.height/2), 1200);
       setTimeout(initialEntranceWave, 800);
     });
-
-  
-
-
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.addEventListener('keydown', e => {
-  if (e.key === "F12" ||
-      (e.ctrlKey && e.shiftKey && ["I","i","J","j","C","c"].includes(e.key)) ||
-      (e.ctrlKey && ["U","u","S","s"].includes(e.key))) {
-    e.preventDefault();
-  }
-});
-
-// Hàm hiệu ứng nổ khi click icon
-function spawnExplosion(x, y) {
-  for (let i = 0; i < 20; i++) {
-    const p = document.createElement("div");
-    p.classList.add("star");
-    p.style.width = p.style.height = Math.random() * 6 + 4 + "px";
-    p.style.left = x + "px";
-    p.style.top = y + "px";
-    p.style.background = "hsl(" + (Math.random()*360) + ",100%,60%)";
-    p.style.setProperty("--x-move", (Math.random() * 300 - 150) + "px");
-    document.body.appendChild(p);
-    setTimeout(() => p.remove(), 2000);
-  }
-}
-
-
-document.querySelectorAll(".social").forEach(el => {
-  el.addEventListener("click", e => {
-    e.preventDefault();
-    const rect = el.getBoundingClientRect();
-    spawnExplosion(rect.left + rect.width/2, rect.top + rect.height/2);
-    setTimeout(() => {
-      window.open(el.dataset.link || el.href, "_blank");
-    }, 500);
-  });
-});
-
-function spawnBlueWaveStars() {
-  for (let i = 0; i < 25; i++) {
-    const star = document.createElement("div");
-    star.classList.add("star");
-    star.style.width = star.style.height = Math.random() * 4 + 2 + "px";
-    star.style.left = Math.random() * window.innerWidth + "px";
-    star.style.top = -10 + "px";
-    star.style.setProperty("--x-move", (Math.random() * 200 - 100) + "px");
-    document.body.appendChild(star);
-    setTimeout(() => star.remove(), 2000);
-  }
-  const wave = document.createElement("div");
-  wave.className = "wave";
-  wave.style.left = window.innerWidth / 2 + "px";
-  wave.style.top = window.innerHeight / 2 + "px";
-  document.body.appendChild(wave);
-  setTimeout(() => wave.remove(), 1200);
-}
-
-function shineCard() {
-  const card = document.querySelector(".card");
-  if (card) {
-    const shine = document.createElement("div");
-    shine.className = "shine";
-    card.appendChild(shine);
-    setTimeout(() => shine.remove(), 2000);
-  }
-}
-
-// Tích hợp vào sự kiện ENTER
-const enterBtnCustom = document.getElementById("enterBtn");
-if (enterBtnCustom) {
-  enterBtnCustom.addEventListener("click", () => {
-    setTimeout(() => {
-      spawnBlueWaveStars();
-      shineCard();
-    }, 300);
-  });
-}
-
-</script>
-
-<style>
-.__blue3d_overlay {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9998;
-  perspective: 1400px;
-  overflow: visible;
-}
-.__blue3d_wave {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 32vmax;
-  height: 32vmax;
-  border-radius: 50%;
-  transform-style: preserve-3d;
-  transform: translate(-50%,-50%) translateZ(-600px) scale(.18) rotateX(20deg);
-  background: radial-gradient(circle at 40% 35%,
-    rgba(0,190,255,0.95),
-    rgba(0,120,220,0.55) 35%,
-    rgba(0,80,180,0.18) 60%,
-    transparent 75%);
-  box-shadow: 0 60px 160px rgba(0,110,180,0.18), inset 0 -20px 80px rgba(255,255,255,0.02);
-  filter: blur(8px) saturate(1.1);
-  will-change: transform, opacity, filter;
-  animation: __blue3d_forward 1200ms cubic-bezier(.2,.9,.3,1) forwards;
-  mix-blend-mode: screen;
-}
-.__blue3d_wave.__layer2 {
-  width: 45vmax;
-  height: 45vmax;
-  transform: translate(-50%,-50%) translateZ(-900px) scale(.12) rotateX(22deg);
-  opacity: 0.85;
-  animation-duration: 1400ms;
-}
-.__blue3d_wave.__layer3 {
-  width: 18vmax;
-  height: 18vmax;
-  transform: translate(-50%,-50%) translateZ(-420px) scale(.26) rotateX(16deg);
-  opacity: 0.92;
-  animation-duration: 1000ms;
-}
-.__blue3d_star {
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #fff 0%, rgba(180,230,255,0.9) 60%, rgba(180,230,255,0.2) 100%);
-  box-shadow: 0 6px 20px rgba(0,160,255,0.12);
-  will-change: transform, opacity;
-  opacity: 0;
-  transform: translateZ(-400px) scale(0.6);
-}
-@keyframes __blue3d_forward {
-  0% { transform: translate(-50%,-50%) translateZ(-900px) scale(.08) rotateX(26deg); opacity: 0.95; filter: blur(12px); }
-  40% { transform: translate(-50%,-50%) translateZ(-340px) scale(.28) rotateX(18deg); opacity: 0.9; filter: blur(6px); }
-  100% { transform: translate(-50%,-50%) translateZ(0px) scale(.98) rotateX(6deg); opacity: 0; filter: blur(18px); }
-}
-</style>
-
-<script>
-function spawnBlueWave3D(opts = {}){
-  const centerX = opts.centerX || window.innerWidth/2;
-  const centerY = opts.centerY || window.innerHeight/2;
-  const starCount = opts.starCount || 28;
-  const overlay = document.createElement('div');
-  overlay.className = '__blue3d_overlay';
-  overlay.style.pointerEvents = 'none';
-  const layer1 = document.createElement('div');
-  layer1.className = '__blue3d_wave __layer1';
-  layer1.style.left = centerX + 'px';
-  layer1.style.top = centerY + 'px';
-  const layer2 = document.createElement('div');
-  layer2.className = '__blue3d_wave __layer2';
-  layer2.style.left = centerX + 'px';
-  layer2.style.top = centerY + 'px';
-  const layer3 = document.createElement('div');
-  layer3.className = '__blue3d_wave __layer3';
-  layer3.style.left = centerX + 'px';
-  layer3.style.top = centerY + 'px';
-  overlay.appendChild(layer2);
-  overlay.appendChild(layer1);
-  overlay.appendChild(layer3);
-  for(let i=0;i<starCount;i++){
-    const s = document.createElement('div');
-    s.className = '__blue3d_star';
-    const x = Math.random() * window.innerWidth;
-    const y = Math.random() * window.innerHeight * 0.6;
-    s.style.left = x + 'px';
-    s.style.top = y + 'px';
-    const tz = -200 - Math.random()*600;
-    s.style.transform = `translateZ(${tz}px) scale(${0.6 + Math.random()*0.9})`;
-    overlay.appendChild(s);
-    const dx = (Math.random()*200 - 100);
-    const dy = 80 + Math.random()*220;
-    const dur = 1000 + Math.random()*900;
-    s.animate([
-      { opacity: 0, transform: `translateZ(${tz}px) scale(${0.6 + Math.random()*0.4})` },
-      { opacity: 1, transform: `translateZ(${tz/2}px) translate(${dx/4}px, ${dy/6}px) scale(1)` },
-      { opacity: 0, transform: `translateZ(0px) translate(${dx}px, ${dy}px) scale(0.4)` }
-    ], {
-      duration: dur,
-      easing: 'cubic-bezier(.2,.8,.2,1)',
-      fill: 'forwards'
-    });
-  }
-  document.body.appendChild(overlay);
-  setTimeout(()=>{
-    overlay.remove();
-  }, 2000);
-}
-const enterBtn3D = document.getElementById('enterBtn');
-if (enterBtn3D) {
-  enterBtn3D.addEventListener('click', function(){
-    setTimeout(()=> spawnBlueWave3D({ starCount: 36 }), 280);
-  });
-}
-</script>
+  </script>
 
 </body>
 </html>
