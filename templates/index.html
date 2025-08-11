@@ -262,7 +262,7 @@
       box-shadow: 0 6px 20px rgba(6,182,212,0.12);
     }
 
-    /* socials */
+    /* socials (original size) */
     .socials { display:flex; gap:12px; margin-top:12px; flex-wrap:wrap; }
     .social {
       display:inline-flex; align-items:center; justify-content:center;
@@ -290,7 +290,113 @@
       50%{ transform: translateY(-8px) }
       100%{ transform: translateY(0px) }
     }
-  </style>
+
+    /* =========================
+       ADDITIONS (overrides)
+       ========================= */
+
+    /* Make socials larger (70px) and add glow hover */
+    .social {
+      width:70px !important;
+      height:70px !important;
+      font-size:32px !important;
+      border-radius:14px !important;
+    }
+    .social:hover {
+      transform: translateY(-6px) scale(1.08) !important;
+      box-shadow: 0 30px 80px rgba(0,162,255,0.12), 0 0 40px rgba(0,140,255,0.14) !important;
+      filter: saturate(1.05);
+    }
+
+    /* star particle for explosion / enter */
+    .__star {
+      position: fixed;
+      pointer-events: none;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+      will-change: transform, opacity;
+    }
+
+    /* shine element on card */
+    .card .__shine {
+      position: absolute;
+      top: -10%;
+      left: -60%;
+      width: 40%;
+      height: 120%;
+      background: linear-gradient(120deg, transparent, rgba(255,255,255,0.5), transparent);
+      transform: skewX(-25deg);
+      mix-blend-mode: overlay;
+      pointer-events: none;
+      z-index: 999;
+      animation: __shineMove 1200ms ease forwards;
+    }
+    @keyframes __shineMove { to { left: 140%; } }
+
+  
+/* === Added custom styles === */
+.social {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:70px !important;
+  height:70px !important;
+  border-radius:12px;
+  text-decoration:none;
+  color:white;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+  border:1px solid rgba(255,255,255,0.03);
+  box-shadow: 0 8px 30px rgba(6,26,37,0.6);
+  font-size: 28px !important;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.social:hover {
+  transform:translateY(-6px) scale(1.1);
+  box-shadow: 0 18px 50px rgba(0, 162, 255, 0.8), 0 0 30px rgba(0, 140, 255, 0.5);
+}
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.8;
+  animation: fall 2s linear forwards;
+}
+@keyframes fall {
+  to { transform: translateY(100vh) translateX(var(--x-move)); opacity: 0; }
+}
+.wave {
+  position:absolute;
+  width:160px;
+  height:160px;
+  border-radius:50%;
+  transform-origin:center;
+  background: radial-gradient(circle, rgba(0,162,255,0.85), rgba(0,90,180,0.35) 40%, rgba(0,70,150,0.12) 60%, transparent 70%);
+  filter: blur(8px) saturate(1.2);
+  mix-blend-mode: screen;
+  pointer-events:none;
+  animation: waveExpand 1000ms cubic-bezier(.2,.9,.3,1) forwards;
+}
+@keyframes waveExpand {
+  0%{ transform: translate3d(-50%,-50%,0) scale(.28) rotateX(18deg); opacity:0.95; }
+  60%{ transform: translate3d(-50%,-50%,-140px) scale(1.6) rotateX(8deg); opacity:0.52; }
+  100%{ transform: translate3d(-50%,-50%,-360px) scale(3.6) rotateX(0deg); opacity:0; }
+}
+.shine {
+  position: absolute;
+  top:0;left:-75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+  transform: skewX(-25deg);
+  animation: shineMove 1.8s ease forwards;
+}
+@keyframes shineMove {
+  to { left: 125%; }
+}
+/* === End custom styles === */
+
+</style>
 </head>
 <body>
 
@@ -299,7 +405,7 @@
   <div class="wave-layer" id="waveLayer" aria-hidden="true"></div>
 
   <div class="enter-screen" id="enterScreen">
-    <div class="logo">NGUYỄN TRỌNG — VIP PRO</div>
+    <div class="logo">NguyenTrongg-bio</div>
     <div style="color:rgba(255,255,255,0.65); margin-top:6px">Quá đẳng cấp</div>
     <button class="enter-btn" id="enterBtn">ENTER</button>
   </div>
@@ -342,12 +448,13 @@
 
       <div class="right">
         <!-- username will be programmatically populated with spans for letters -->
-        <div class="username neon" id="username" data-shadow="NGUYỄN TRỌNG" aria-live="polite"></div>
+        <div class="username neon" id="username" data-shadow="NguyenTrongg" aria-live="polite"></div>
         <div class="bio" id="bioText">Quá vip</div>
 
         <div class="socials" id="socials">
-          <a class="social" href="https://www.facebook.com/NguyenTrong6565" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-          <a class="social" href="https://discord.gg/bpZqKr2EWQ" target="_blank" aria-label="Discord"><i class="fab fa-discord"></i></a>
+          <!-- keep hrefs (for fallback), but we'll intercept clicks to show explosion before open -->
+          <a class="social" href="https://www.facebook.com/NguyenTrong6565" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a class="social" href="https://discord.gg/bpZqKr2EWQ" target="_blank" rel="noopener noreferrer" aria-label="Discord"><i class="fab fa-discord"></i></a>
           <!-- thêm icon khác nếu cần -->
         </div>
 
@@ -499,7 +606,7 @@
     };
 
     // initial rendering for default name
-    render3DName('NGUYỄN TRỌNG');
+    render3DName('NguyenTrongg');
 
     // initial wave on first enter (center)
     function initialEntranceWave(){
@@ -718,11 +825,366 @@
       if(avatarPath) { document.querySelector('#avatar img').src = avatarPath; }
     };
 
-    // spawn a welcome wave shortly after page load
+    /* =========================
+       NEW ADDITIONS (injected, non-destructive)
+       ========================= */
+
+    // 1) Block context menu & common devtools keys (already top-level requested, duplicate-protected)
+    (function protectShortcuts(){
+      // prevent right click (already a common approach)
+      document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+
+      // block key combos
+      document.addEventListener('keydown', function(e){
+        // F12
+        if (e.key === 'F12') { e.preventDefault(); return; }
+        // Ctrl+Shift+I / J / C
+        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) {
+          e.preventDefault(); return;
+        }
+        // Ctrl+U, Ctrl+S (view-source / save)
+        if (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.key === 'S' || e.key === 's')) {
+          e.preventDefault(); return;
+        }
+      }, {capture:true});
+    })();
+
+    // 2) Make social icons larger visually (we also overrode CSS)
+    // (No JS needed here except providing explosion + open behavior)
+
+    // 3) Explosion effect on social click (intercept existing anchors)
+    (function attachSocialExplosions(){
+      const socials = document.querySelectorAll('.socials a.social');
+      socials.forEach(a => {
+        a.addEventListener('click', function(ev){
+          ev.preventDefault();
+          // get center coords
+          const r = a.getBoundingClientRect();
+          const cx = r.left + r.width/2;
+          const cy = r.top + r.height/2;
+          spawnExplosionVisual(cx, cy);
+          // brief scale pop
+          a.style.transition = 'transform .22s ease';
+          a.style.transform = 'scale(0.95)';
+          setTimeout(()=> a.style.transform = '', 220);
+          // open link after short delay so explosion visible
+          const href = a.href;
+          setTimeout(()=> {
+            try { window.open(href, '_blank', 'noopener'); } catch(e){ window.location.href = href; }
+          }, 520);
+        });
+      });
+
+      function spawnExplosionVisual(x, y){
+        const count = 20;
+        for (let i=0;i<count;i++){
+          const el = document.createElement('div');
+          el.className = '__star';
+          const size = Math.random()*10 + 6;
+          el.style.width = el.style.height = size + 'px';
+          el.style.left = x + 'px';
+          el.style.top = y + 'px';
+          el.style.background = `hsl(${Math.random()*360}, 80%, ${50 + Math.random()*15}%)`;
+          document.body.appendChild(el);
+          // animate: random direction
+          const angle = Math.random()*Math.PI*2;
+          const dist = 60 + Math.random()*220;
+          const dx = Math.cos(angle)*dist;
+          const dy = Math.sin(angle)*dist - (Math.random()*60);
+          el.animate([
+            { transform: 'translate(0,0) scale(1)', opacity: 1 },
+            { transform: `translate(${dx}px, ${dy}px) scale(0.6)`, opacity: 0 }
+          ], {
+            duration: 700 + Math.random()*600,
+            easing: 'cubic-bezier(.2,.9,.3,1)'
+          });
+          setTimeout(()=> el.remove(), 1400);
+        }
+      }
+    })();
+
+    // 4) On ENTER: spawn blue wave + many small stars (3D-looking) and shine card
+    (function attachEnterEffects(){
+      const enter = document.getElementById('enterBtn');
+      enter.addEventListener('click', function(){
+        // spawn multiple blue waves for drama
+        spawnBlueWave(window.innerWidth/2, window.innerHeight/2);
+        setTimeout(()=> spawnBlueWave(window.innerWidth/2 + 140, window.innerHeight/2 - 80), 140);
+        setTimeout(()=> spawnBlueWave(window.innerWidth/2 - 160, window.innerHeight/2 + 60), 300);
+        // spawn falling stars
+        spawnFallingStars(28);
+        // shine card
+        const card = document.querySelector('.card');
+        if(card){
+          const s = document.createElement('div');
+          s.className = '__shine';
+          card.appendChild(s);
+          setTimeout(()=> s.remove(), 1200);
+        }
+      });
+
+      function spawnBlueWave(cx, cy){
+        const el = document.createElement('div');
+        el.className = 'wave';
+        // override color to blue
+        el.style.background = 'radial-gradient(circle, rgba(0,162,255,0.9), rgba(0,90,180,0.38) 40%, rgba(0,70,150,0.12) 60%, transparent 75%)';
+        el.style.left = cx + 'px';
+        el.style.top = cy + 'px';
+        el.style.filter = 'blur(6px) saturate(1.05)';
+        el.style.boxShadow = '0 30px 80px rgba(0,94,180,0.18)';
+        waveLayer.appendChild(el);
+        el.addEventListener('animationend', ()=> el.remove());
+      }
+
+      function spawnFallingStars(n){
+        for (let i=0;i<n;i++){
+          const star = document.createElement('div');
+          star.className = '__star';
+          const size = 2 + Math.random()*5;
+          star.style.width = star.style.height = size + 'px';
+          star.style.left = (Math.random()*window.innerWidth) + 'px';
+          star.style.top = (-20 - Math.random()*40) + 'px';
+          star.style.background = `linear-gradient(180deg, rgba(255,255,255,1), rgba(180,220,255,0.9))`;
+          document.body.appendChild(star);
+          const fallDist = window.innerHeight + 200 + Math.random()*200;
+          const xMove = (Math.random()*300 - 150);
+          star.animate([
+            { transform: 'translate(0,0) rotate(0deg)', opacity:1 },
+            { transform: `translate(${xMove}px, ${fallDist}px) rotate(${Math.random()*360}deg)`, opacity:0 }
+          ], {
+            duration: 1200 + Math.random()*1000,
+            easing: 'cubic-bezier(.2,.8,.2,1)'
+          });
+          setTimeout(()=> star.remove(), 2600);
+        }
+      }
+    })();
+
+    // 5) small helper: shine card on demand (also used elsewhere)
+    function shineCardOnce(){
+      const card = document.querySelector('.card');
+      if(!card) return;
+      const s = document.createElement('div');
+      s.className = '__shine';
+      card.appendChild(s);
+      setTimeout(()=> s.remove(), 1200);
+    }
+
+    // 6) Expose utilities if needed
+    window.__vipExtras = {
+      shineCard: shineCardOnce
+    };
+
+    // spawn a welcome wave shortly after page load (original behavior preserved)
     window.addEventListener('load', ()=> {
       setTimeout(initialEntranceWave, 800);
     });
 
-  </script>
+  
+/* === Added custom JS === */
+
+// Chặn xem mã nguồn
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+  if (e.key === "F12" ||
+      (e.ctrlKey && e.shiftKey && ["I","i","J","j","C","c"].includes(e.key)) ||
+      (e.ctrlKey && ["U","u","S","s"].includes(e.key))) {
+    e.preventDefault();
+  }
+});
+
+// Hàm hiệu ứng nổ khi click icon
+function spawnExplosion(x, y) {
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement("div");
+    p.classList.add("star");
+    p.style.width = p.style.height = Math.random() * 6 + 4 + "px";
+    p.style.left = x + "px";
+    p.style.top = y + "px";
+    p.style.background = "hsl(" + (Math.random()*360) + ",100%,60%)";
+    p.style.setProperty("--x-move", (Math.random() * 300 - 150) + "px");
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 2000);
+  }
+}
+
+// Gán sự kiện click cho icon mạng xã hội
+document.querySelectorAll(".social").forEach(el => {
+  el.addEventListener("click", e => {
+    e.preventDefault();
+    const rect = el.getBoundingClientRect();
+    spawnExplosion(rect.left + rect.width/2, rect.top + rect.height/2);
+    setTimeout(() => {
+      window.open(el.dataset.link || el.href, "_blank");
+    }, 500);
+  });
+});
+
+// Hàm tạo sóng xanh + sao rơi khi ENTER
+function spawnBlueWaveStars() {
+  for (let i = 0; i < 25; i++) {
+    const star = document.createElement("div");
+    star.classList.add("star");
+    star.style.width = star.style.height = Math.random() * 4 + 2 + "px";
+    star.style.left = Math.random() * window.innerWidth + "px";
+    star.style.top = -10 + "px";
+    star.style.setProperty("--x-move", (Math.random() * 200 - 100) + "px");
+    document.body.appendChild(star);
+    setTimeout(() => star.remove(), 2000);
+  }
+  const wave = document.createElement("div");
+  wave.className = "wave";
+  wave.style.left = window.innerWidth / 2 + "px";
+  wave.style.top = window.innerHeight / 2 + "px";
+  document.body.appendChild(wave);
+  setTimeout(() => wave.remove(), 1200);
+}
+
+// Hiệu ứng quét sáng card
+function shineCard() {
+  const card = document.querySelector(".card");
+  if (card) {
+    const shine = document.createElement("div");
+    shine.className = "shine";
+    card.appendChild(shine);
+    setTimeout(() => shine.remove(), 2000);
+  }
+}
+
+// Tích hợp vào sự kiện ENTER
+const enterBtnCustom = document.getElementById("enterBtn");
+if (enterBtnCustom) {
+  enterBtnCustom.addEventListener("click", () => {
+    setTimeout(() => {
+      spawnBlueWaveStars();
+      shineCard();
+    }, 300);
+  });
+}
+
+/* === End custom JS === */
+</script>
+
+<!-- 3D Blue Wave Overlay additions -->
+<style>
+.__blue3d_overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  perspective: 1400px;
+  overflow: visible;
+}
+.__blue3d_wave {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 32vmax;
+  height: 32vmax;
+  border-radius: 50%;
+  transform-style: preserve-3d;
+  transform: translate(-50%,-50%) translateZ(-600px) scale(.18) rotateX(20deg);
+  background: radial-gradient(circle at 40% 35%,
+    rgba(0,190,255,0.95),
+    rgba(0,120,220,0.55) 35%,
+    rgba(0,80,180,0.18) 60%,
+    transparent 75%);
+  box-shadow: 0 60px 160px rgba(0,110,180,0.18), inset 0 -20px 80px rgba(255,255,255,0.02);
+  filter: blur(8px) saturate(1.1);
+  will-change: transform, opacity, filter;
+  animation: __blue3d_forward 1200ms cubic-bezier(.2,.9,.3,1) forwards;
+  mix-blend-mode: screen;
+}
+.__blue3d_wave.__layer2 {
+  width: 45vmax;
+  height: 45vmax;
+  transform: translate(-50%,-50%) translateZ(-900px) scale(.12) rotateX(22deg);
+  opacity: 0.85;
+  animation-duration: 1400ms;
+}
+.__blue3d_wave.__layer3 {
+  width: 18vmax;
+  height: 18vmax;
+  transform: translate(-50%,-50%) translateZ(-420px) scale(.26) rotateX(16deg);
+  opacity: 0.92;
+  animation-duration: 1000ms;
+}
+.__blue3d_star {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, rgba(180,230,255,0.9) 60%, rgba(180,230,255,0.2) 100%);
+  box-shadow: 0 6px 20px rgba(0,160,255,0.12);
+  will-change: transform, opacity;
+  opacity: 0;
+  transform: translateZ(-400px) scale(0.6);
+}
+@keyframes __blue3d_forward {
+  0% { transform: translate(-50%,-50%) translateZ(-900px) scale(.08) rotateX(26deg); opacity: 0.95; filter: blur(12px); }
+  40% { transform: translate(-50%,-50%) translateZ(-340px) scale(.28) rotateX(18deg); opacity: 0.9; filter: blur(6px); }
+  100% { transform: translate(-50%,-50%) translateZ(0px) scale(.98) rotateX(6deg); opacity: 0; filter: blur(18px); }
+}
+</style>
+
+<script>
+function spawnBlueWave3D(opts = {}){
+  const centerX = opts.centerX || window.innerWidth/2;
+  const centerY = opts.centerY || window.innerHeight/2;
+  const starCount = opts.starCount || 28;
+  const overlay = document.createElement('div');
+  overlay.className = '__blue3d_overlay';
+  overlay.style.pointerEvents = 'none';
+  const layer1 = document.createElement('div');
+  layer1.className = '__blue3d_wave __layer1';
+  layer1.style.left = centerX + 'px';
+  layer1.style.top = centerY + 'px';
+  const layer2 = document.createElement('div');
+  layer2.className = '__blue3d_wave __layer2';
+  layer2.style.left = centerX + 'px';
+  layer2.style.top = centerY + 'px';
+  const layer3 = document.createElement('div');
+  layer3.className = '__blue3d_wave __layer3';
+  layer3.style.left = centerX + 'px';
+  layer3.style.top = centerY + 'px';
+  overlay.appendChild(layer2);
+  overlay.appendChild(layer1);
+  overlay.appendChild(layer3);
+  for(let i=0;i<starCount;i++){
+    const s = document.createElement('div');
+    s.className = '__blue3d_star';
+    const x = Math.random() * window.innerWidth;
+    const y = Math.random() * window.innerHeight * 0.6;
+    s.style.left = x + 'px';
+    s.style.top = y + 'px';
+    const tz = -200 - Math.random()*600;
+    s.style.transform = `translateZ(${tz}px) scale(${0.6 + Math.random()*0.9})`;
+    overlay.appendChild(s);
+    const dx = (Math.random()*200 - 100);
+    const dy = 80 + Math.random()*220;
+    const dur = 1000 + Math.random()*900;
+    s.animate([
+      { opacity: 0, transform: `translateZ(${tz}px) scale(${0.6 + Math.random()*0.4})` },
+      { opacity: 1, transform: `translateZ(${tz/2}px) translate(${dx/4}px, ${dy/6}px) scale(1)` },
+      { opacity: 0, transform: `translateZ(0px) translate(${dx}px, ${dy}px) scale(0.4)` }
+    ], {
+      duration: dur,
+      easing: 'cubic-bezier(.2,.8,.2,1)',
+      fill: 'forwards'
+    });
+  }
+  document.body.appendChild(overlay);
+  setTimeout(()=>{
+    overlay.remove();
+  }, 2000);
+}
+const enterBtn3D = document.getElementById('enterBtn');
+if (enterBtn3D) {
+  enterBtn3D.addEventListener('click', function(){
+    setTimeout(()=> spawnBlueWave3D({ starCount: 36 }), 280);
+  });
+}
+</script>
+
 </body>
 </html>
