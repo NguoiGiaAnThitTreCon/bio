@@ -420,7 +420,7 @@
   <div class="wave-layer" id="waveLayer" aria-hidden="true"></div>
 
   <div class="enter-screen" id="enterScreen">
-    <div class="logo">NguyenTrongg-bio</div>
+    <div class="logo">Welcome to my Bio</div>
     <div style="color:rgba(255,255,255,0.65); margin-top:6px">Lưu ý: dùng mobile thì xoay ngang màn hình</div>
     <button class="enter-btn" id="enterBtn">ENTER</button>
   </div>
@@ -434,7 +434,7 @@
         <div class="avatar-halo"></div>
 
         <div class="avatar-wrap" id="avatarWrap" title="Avatar">
-          <div class="badge">PREMIUM</div>
+          <div class="badge">Premium</div>
           <div class="avatar" id="avatar">
             <img src="static/avatar.png" alt="avatar">
           </div>
@@ -444,7 +444,6 @@
         <div style="width:100%; display:flex; flex-direction:column; align-items:center; margin-top:8px;">
           <div style="font-size:12px; color:rgba(255,255,255,0.6);">Now playing</div>
           <div class="eq" id="eq">
-            <!-- 12 bars -->
             <div class="bar" style="height:14%"></div>
             <div class="bar" style="height:22%"></div>
             <div class="bar" style="height:18%"></div>
@@ -474,7 +473,7 @@
         </div>
 
         <div style="margin-top:auto; color:rgba(255,255,255,0.45); font-size:13px;">
-          Dùng mobile thì xoay ngang màn hình • Đã tối ưu cho mobile • Vẫn lag thì chịu
+          Liên hệ fb/discord
         </div>
       </div>
     </div>
@@ -509,7 +508,7 @@
     const waveLayer = document.getElementById('waveLayer');
 
 
-    const bioString = "My bio Nguyen TRong. Liên hệ: discord/FB.";
+    const bioString = "Anh Trọng đẹp trai chim dài, còn em đóng vai người chồng bất lực nhìn vợ mình lên giường ứ ừ với anh Trọng 1 đêm đầy lãng mạn |";
     const bioText = document.getElementById('bioText');
 
 
@@ -554,7 +553,7 @@
 
     let lastWaveAt = 0;
     document.addEventListener('mousemove', e => {
-      // throttle gentle waves
+
       const now = Date.now();
       if(now - lastWaveAt < 220) return;
       lastWaveAt = now;
@@ -564,7 +563,7 @@
     });
 
     document.addEventListener('click', e => {
-      // spawn a larger wave on click
+
       const large = document.createElement('div');
       large.className = 'wave';
       large.style.width = '260px';
@@ -589,7 +588,7 @@
       const dy = (cy - centerY) / rect.height;
 
       usernameEl.style.transform = `perspective(900px) rotateX(${(-dy*6).toFixed(2)}deg) rotateY(${(dx*8).toFixed(2)}deg)`;
-      // also subtly adjust each letter based on distance
+
       const letters = usernameEl.querySelectorAll('.letter');
       letters.forEach((l, i) => {
         const offset = (i - letters.length/2) * 0.26;
@@ -623,7 +622,7 @@
 
     render3DName('NguyenTrongg');
 
-    // initial wave on first enter (center)
+
     function initialEntranceWave(){
       const cx = window.innerWidth/2;
       const cy = window.innerHeight/2;
