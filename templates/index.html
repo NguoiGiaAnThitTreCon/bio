@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bio — Nguyễn Trọng</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root{
+      --gold1:#ffd54a;
+      --gold2:#ffb300;
+      --glass: rgba(0,0,0,0.55);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:'Segoe UI', Arial, sans-serif;
+      background:#000; color:#fff; overflow:hidden;
+    }
+    /* Màn hình chờ */
+    .enter-screen{
+      position:fixed; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      flex-direction:column; gap:20px;
+      background:#000;
+      z-index:10;
+    }
+    .enter-btn{
+      padding:16px 40px;
+      background:linear-gradient(90deg,var(--gold1),var(--gold2));
+      border:none;
+      border-radius:40px;
+      color:#111;
+      font-size:24px; font-weight:bold;
+      cursor:pointer;
+      box-shadow:0 0 20px rgba(255,215,0,0.6);
+      transition:0.3s;
+    }
+    .enter-btn:hover{
+      transform:scale(1.08);
+      box-shadow:0 0 30px var(--gold1);
+    }
+
+    /* Banner nền */
+    .banner{
+      position:fixed; inset:0; z-index:0; overflow:hidden;
+    }
+    .banner video{
+      position:absolute; left:50%; top:50%;
+      transform:translate(-50%,-50%);
+      min-width:100%; min-height:100%;
+      object-fit:cover;
+      filter:brightness(.6);
+    }
+
+    /* Nội dung bio */
+    .info-wrap{
+      position:relative; z-index:1;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      min-height:100vh; padding:40px 20px;
+    }
+    .card {
+      background: var(--glass);
+      border-radius:18px;
+      padding:28px 36px;
+      text-align:center;
+      box-shadow: 0 10px 60px rgba(0,0,0,0.6);
+      backdrop-filter: blur(6px);
+      max-width:900px;
+      width:min(90%,900px);
+    }
+    .avatar {
+      width:180px; height:180px; border-radius:50%;
+      border:6px solid var(--gold1);
+      box-shadow: 0 0 25px var(--gold1), 0 0 50px rgba(255,215,0,0.4);
+      background:#222; overflow:hidden;
+      animation: glow 3s ease-in-out infinite alternate;
+      margin: 0 auto;
+    }
+    @keyframes glow {
+      from { box-shadow:0 0 20px var(--gold1), 0 0 40px rgba(255,215,0,0.3); }
+      to   { box-shadow:0 0 35px var(--gold2), 0 0 60px rgba(255,215,0,0.5); }
+    }
+    .avatar img { width:100%; height:100%; object-fit:cover; }
+    .username{
+      margin-top:12px;
+      font-size:42px; font-weight:800;
+      background: linear-gradient(90deg, var(--gold1), #fff, var(--gold2));
+      background-size:200% 100%;
+      -webkit-background-clip:text; color:transparent;
+      animation: shimmer 2.5s linear infinite;
+      text-shadow: 0 0 10px rgba(255,215,0,0.6);
+    }
+    @keyframes shimmer{ 0%{ background-position:0% 50%; } 100%{ background-position:200% 50%; } }
+    .bio {
+      margin-top:10px;
+      font-size:20px; font-weight:700;
+      background: linear-gradient(270deg, red, orange, yellow, green, cyan, blue, violet, red);
+      background-size:800% 800%;
+      -webkit-background-clip:text; color:transparent;
+      animation: rainbow 0.8s linear infinite;
+    }
+    @keyframes rainbow { 0%{background-position:0% 50%} 100%{background-position:100% 50%} }
+    .socials{ display:flex; gap:18px; justify-content:center; margin-top:18px; }
+    .social{
+      width:64px;height:64px;border-radius:50%; display:flex;align-items:center;justify-content:center;
+      background:rgba(255,255,255,0.05);
+      border:1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 0 15px rgba(255,215,0,0.4);
+      transition: transform .14s ease, box-shadow .14s ease;
+      text-decoration:none; color:white; font-size:26px;
+    }
+    .social:hover{ transform:translateY(-6px); box-shadow: 0 0 25px var(--gold1); }
+  </style>
+</head>
+<body>
+
+<!-- Màn hình chờ -->
+<div class="enter-screen" id="enterScreen">
+  <h1 style="color:var(--gold1); font-size:40px;">Welcome</h1>
+  <button class="enter-btn" id="enterBtn">ENTER</button>
+</div>
+
+<!-- Banner video -->
+<div class="banner">
+  <video src="static/banner.mp4" autoplay loop muted playsinline></video>
+</div>
+
+<!-- Nội dung Bio -->
+<div class="info-wrap" style="display:none;" id="bioContent">
+  <div class="card">
+    <div class="avatar">
+      <img src="static/avatar.png" alt="avatar">
+    </div>
+    <div class="username">NguyenTrongg</div>
+    <div class="bio">Anh Trọng chim dài, còn em đóng vai người chồng bất lực nhìn vợ mình xa theo anh Trọng</div>
+    <div class="socials">
+      <a class="social" href="https://www.facebook.com/NguyenTrong6565" target="_blank"><i class="fab fa-facebook-f"></i></a>
+      <a class="social" href="https://discord.gg/bpZqKr2EWQ" target="_blank"><i class="fab fa-discord"></i></a>
+    </div>
+  </div>
+</div>
+
+<!-- Nhạc -->
+<audio id="bgAudio" loop>
+  <source src="static/music.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+  const enterBtn = document.getElementById('enterBtn');
+  const enterScreen = document.getElementById('enterScreen');
+  const bioContent = document.getElementById('bioContent');
+  const bgAudio = document.getElementById('bgAudio');
+
+  enterBtn.addEventListener('click', () => {
+    enterScreen.style.display = 'none';
+    bioContent.style.display = 'flex';
+    bgAudio.play().catch(()=>{});
+  });
+</script>
+
+</body>
+</html>
