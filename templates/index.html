@@ -1,6 +1,30 @@
 <!doctype html>
 <html lang="vi">
-<head>
+\1
+
+<script>
+(function() {
+  document.addEventListener('keydown', e => {
+    if (e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && ["I","i","J","j","C","c"].includes(e.key)) ||
+        (e.ctrlKey && ["U","u","S","s"].includes(e.key))) {
+      e.preventDefault();
+    }
+  }, true);
+
+  document.addEventListener('contextmenu', e => e.preventDefault());
+
+  // Phát hiện mở DevTools
+  setInterval(function() {
+    const before = new Date();
+    debugger;
+    if (new Date() - before > 200) {
+      location.href = "about:blank";
+    }
+  }, 500);
+})();
+</script>
+
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Bio — Nguyễn Trọng (VIP Pro)</title>
