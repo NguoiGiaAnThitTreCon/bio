@@ -205,6 +205,16 @@ body::before {
 }
 
 </style>
+<style>
+#particle-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: transparent;
+  pointer-events: none;
+}
+</style>
+
 
 <style>
 
@@ -299,6 +309,7 @@ body::before {
 /* ===== NEW UPGRADE CSS (END) ===== */
 </style></head>
 <body>
+<canvas id='particle-canvas'></canvas>
 
   <div id="vanta-bg"></div>
   <div class="overlay"></div>
@@ -749,6 +760,7 @@ body::before {
     function initialEntranceWave(){ const cx = window.innerWidth/2; const cy = window.innerHeight/2; spawnWave(cx, cy); setTimeout(()=> spawnWave(cx+120, cy-80), 160); setTimeout(()=> spawnWave(cx-160, cy+60), 320); }
 
     enterBtn.addEventListener('click', async () => {
+      startParticleIntro();
       enterScreen.classList.add('exit');
       setTimeout(()=>{ enterScreen.style.display='none'; mainWrap.style.display='flex'; }, 800);
       setTimeout(initialEntranceWave, 240);
@@ -997,5 +1009,127 @@ setInterval(()=>{
   }
   if(audio){ audio.addEventListener('play', ()=> { if(!audioCtx) setupAudio(); }); }
 })();
-</script></body>
+</script>
+<script>
+(function(){
+  const particleCanvas = document.getElementById('particle-canvas');
+  const ctxP = particleCanvas.getContext('2d');
+  let particles = [], targets = [], animating = false;
+  const DPR = window.devicePixelRatio || 1;
+
+  function resizeCanvas(){
+    particleCanvas.width = window.innerWidth * DPR;
+    particleCanvas.height = window.innerHeight * DPR;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  function createParticlesFromText(text, font, x, y){
+    const off = document.createElement('canvas');
+    const offCtx = off.getContext('2d');
+    off.width = window.innerWidth;
+    off.height = window.innerHeight;
+    offCtx.font = font;
+    offCtx.fillStyle = '#fff';
+    offCtx.textAlign = 'center';
+    offCtx.textBaseline = 'middle';
+    offCtx.fillText(text, x, y);
+    const imgData = offCtx.getImageData(0,0,off.width, off.height).data;
+    const points = [];
+    for(let py=0; py<off.height; py+=4){
+      for(let px=0; px<off.width; px+=4){
+        const idx = (py*off.width + px)*4;
+        if(imgData[idx+3] > 128){
+          points.push({x:px, y:py});
+        }
+      }
+    }
+    return points;
+  }
+
+  function createParticlesFromImage(img, x, y, scale=1){
+    const off = document.createElement('canvas');
+    const offCtx = off.getContext('2d');
+    const w = img.width * scale;
+    const h = img.height * scale;
+    off.width = w; off.height = h;
+    offCtx.drawImage(img, 0, 0, w, h);
+    const imgData = offCtx.getImageData(0,0,w,h).data;
+    const points = [];
+    for(let py=0; py<h; py+=3){
+      for(let px=0; px<w; px+=3){
+        const idx = (py*w + px)*4;
+        if(imgData[idx+3] > 128){
+          points.push({x:x+px, y:y+py});
+        }
+      }
+    }
+    return points;
+  }
+
+  function initParticles(){
+    particles = [];
+    const username = document.getElementById('username').getAttribute('data-shadow') || 'USERNAME';
+    const bio = document.getElementById('bioText').textContent || 'BIO TEXT';
+    const avatarImg = document.getElementById('avatarImg');
+
+    let points = [];
+    points = points.concat(createParticlesFromText(username, 'bold 48px Montserrat', window.innerWidth/2, window.innerHeight/2 - 100));
+    points = points.concat(createParticlesFromText(bio, '18px Poppins', window.innerWidth/2, window.innerHeight/2));
+    if(avatarImg.complete){
+      points = points.concat(createParticlesFromImage(avatarImg, window.innerWidth/2 - 70, window.innerHeight/2 - 200, 0.35));
+    }
+
+    particles = points.map(p=>{
+      return {
+        x: Math.random()*window.innerWidth*DPR,
+        y: Math.random()*window.innerHeight*DPR,
+        tx: p.x*DPR,
+        ty: p.y*DPR,
+        color: '#fff',
+        size: 1 + Math.random()*2
+      };
+    });
+  }
+
+  function animateParticles(duration=2000){
+    const start = performance.now();
+    animating = true;
+    function frame(now){
+      const t = Math.min(1, (now - start)/duration);
+      ctxP.clearRect(0,0,particleCanvas.width, particleCanvas.height);
+      particles.forEach(p=>{
+        const progress = t<0.8 ? t : t + 0.2*(Math.sin((t-0.8)*Math.PI));
+        const x = p.x + (p.tx - p.x) * progress;
+        const y = p.y + (p.ty - p.y) * progress;
+        let col = p.color;
+        if(t>0.7){
+          const mix = Math.floor((t-0.7)/0.3*255);
+          col = `rgb(${255}, ${255 - mix*0.5}, ${255})`;
+        }
+        ctxP.fillStyle = col;
+        ctxP.beginPath();
+        ctxP.arc(x, y, p.size, 0, Math.PI*2);
+        ctxP.fill();
+      });
+      if(t<1){
+        requestAnimationFrame(frame);
+      } else {
+        animating = false;
+        particleCanvas.style.display = 'none';
+        document.querySelector('.wrap').style.opacity = 1;
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  window.startParticleIntro = function(){
+    particleCanvas.style.display = 'block';
+    document.querySelector('.wrap').style.opacity = 0;
+    initParticles();
+    animateParticles(2000);
+  };
+})();
+</script>
+</body>
 </html>
