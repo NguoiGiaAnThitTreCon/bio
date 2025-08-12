@@ -1,6 +1,32 @@
 <!doctype html>
 <html lang="vi">
 <head>
+  <script>
+    // Detect mobile or PC and set class
+    (function(){
+      var isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
+        .test(navigator.userAgent);
+      document.addEventListener("DOMContentLoaded", function(){
+        document.body.classList.add(isMobile ? "is-mobile" : "is-pc");
+      });
+    })();
+  </script>
+
+  <style>
+    /* Mobile-specific overrides */
+    body.is-mobile .rotate-overlay { display: none !important; }
+    body.is-mobile .wrap { 
+      transform: none !important; 
+      position: relative !important; 
+      top: auto; 
+      left: auto; 
+      scale: 1 !important;
+    }
+    body.is-mobile .username { font-size: 28px !important; }
+    body.is-mobile .avatar-wrap { width: 120px !important; height: 120px !important; }
+    body.is-mobile .avatar { width: 110px !important; height: 110px !important; }
+  </style>
+
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Bio — NguyenTrongg</title>
@@ -205,16 +231,6 @@ body::before {
 }
 
 </style>
-<style>
-#particle-canvas {
-  position: fixed;
-  inset: 0;
-  z-index: 9998;
-  background: transparent;
-  pointer-events: none;
-}
-</style>
-
 
 <style>
 
@@ -309,7 +325,6 @@ body::before {
 /* ===== NEW UPGRADE CSS (END) ===== */
 </style></head>
 <body>
-<canvas id='particle-canvas'></canvas>
 
   <div id="vanta-bg"></div>
   <div class="overlay"></div>
@@ -317,14 +332,14 @@ body::before {
 
   <div class="enter-screen" id="enterScreen" role="dialog" aria-modal="true" aria-label="Màn chào mừng">
     <div class="logo">Welcome to my Bio</div>
-    <div style="color:rgba(255,255,255,0.65); margin-top:6px">Lưu ý: dùng mobile thì xoay ngang màn hình (màn hình sẽ tự xoay nội dung)</div>
+    <div style="color:rgba(255,255,255,0.65); margin-top:6px">bản mobile là bản đã tối ưu hóa để tránh lag.Muốn trải nhiệm full tính năng thì dùng Máy tính</div>
     <button class="enter-btn" id="enterBtn">ENTER</button>
   </div>
 
   <div class="rotate-overlay" id="rotateOverlay" aria-hidden="true">
     <div class="hint">
-      Để trải nghiệm tốt nhất trên điện thoại, xoay thiết bị sang ngang / landscape.<br>
-      Nếu bạn không thể xoay, trang sẽ cố gắng xoay nội dung thay bạn.
+      <br>
+      
     </div>
   </div>
 
@@ -344,7 +359,7 @@ body::before {
         </div>
 
         <div style="width:100%; display:flex; flex-direction:column; align-items:center; margin-top:8px;">
-          <div style="font-size:12px; color:rgba(255,255,255,0.6);">Now playing</div>
+          <div style="font-size:12px; color:rgba(255,255,255,0.6);">NguyenTrongg</div>
           <div class="eq" id="eq" aria-hidden="true">
             <div class="bar" style="height:14%"></div>
             <div class="bar" style="height:22%"></div>
@@ -583,7 +598,7 @@ body::before {
     const avatarImg = document.getElementById('avatarImg');
 
     const displayName = 'NguyenTrongg';
-    const bioString = "Anh Trọng đẹp trai chim dài, còn em đóng vai người chồng bất lực nhìn vợ mình lên giường ứ ừ với anh Trọng|";
+    const bioString = "Anh Trọng đẹp trai chim dài,còn em chim ngắn";
 
     function render3DName(text){
       usernameEl.innerHTML = '';
@@ -760,7 +775,6 @@ body::before {
     function initialEntranceWave(){ const cx = window.innerWidth/2; const cy = window.innerHeight/2; spawnWave(cx, cy); setTimeout(()=> spawnWave(cx+120, cy-80), 160); setTimeout(()=> spawnWave(cx-160, cy+60), 320); }
 
     enterBtn.addEventListener('click', async () => {
-      startParticleIntro();
       enterScreen.classList.add('exit');
       setTimeout(()=>{ enterScreen.style.display='none'; mainWrap.style.display='flex'; }, 800);
       setTimeout(initialEntranceWave, 240);
@@ -1011,125 +1025,42 @@ setInterval(()=>{
 })();
 </script>
 <script>
-(function(){
-  const particleCanvas = document.getElementById('particle-canvas');
-  const ctxP = particleCanvas.getContext('2d');
-  let particles = [], targets = [], animating = false;
-  const DPR = window.devicePixelRatio || 1;
+function burstBigStars() {
+  const count = 50; // số sao
+  for (let i = 0; i < count; i++) {
+    const star = document.createElement('div');
+    star.className = 'big-star';
+    const size = 8 + Math.random() * 40; // to hơn
+    star.style.width = size + 'px';
+    star.style.height = size + 'px';
+    star.style.left = window.innerWidth / 2 + 'px';
+    star.style.top = window.innerHeight / 2 + 'px';
+    document.body.appendChild(star);
 
-  function resizeCanvas(){
-    particleCanvas.width = window.innerWidth * DPR;
-    particleCanvas.height = window.innerHeight * DPR;
-  }
-  resizeCanvas();
-  window.addEventListener('resize', resizeCanvas);
+    // vị trí ngẫu nhiên bay ra
+    const angle = Math.random() * Math.PI * 2;
+    const distance = 100 + Math.random() * 500;
+    const dx = Math.cos(angle) * distance;
+    const dy = Math.sin(angle) * distance;
 
-  function createParticlesFromText(text, font, x, y){
-    const off = document.createElement('canvas');
-    const offCtx = off.getContext('2d');
-    off.width = window.innerWidth;
-    off.height = window.innerHeight;
-    offCtx.font = font;
-    offCtx.fillStyle = '#fff';
-    offCtx.textAlign = 'center';
-    offCtx.textBaseline = 'middle';
-    offCtx.fillText(text, x, y);
-    const imgData = offCtx.getImageData(0,0,off.width, off.height).data;
-    const points = [];
-    for(let py=0; py<off.height; py+=4){
-      for(let px=0; px<off.width; px+=4){
-        const idx = (py*off.width + px)*4;
-        if(imgData[idx+3] > 128){
-          points.push({x:px, y:py});
-        }
-      }
-    }
-    return points;
-  }
-
-  function createParticlesFromImage(img, x, y, scale=1){
-    const off = document.createElement('canvas');
-    const offCtx = off.getContext('2d');
-    const w = img.width * scale;
-    const h = img.height * scale;
-    off.width = w; off.height = h;
-    offCtx.drawImage(img, 0, 0, w, h);
-    const imgData = offCtx.getImageData(0,0,w,h).data;
-    const points = [];
-    for(let py=0; py<h; py+=3){
-      for(let px=0; px<w; px+=3){
-        const idx = (py*w + px)*4;
-        if(imgData[idx+3] > 128){
-          points.push({x:x+px, y:y+py});
-        }
-      }
-    }
-    return points;
-  }
-
-  function initParticles(){
-    particles = [];
-    const username = document.getElementById('username').getAttribute('data-shadow') || 'USERNAME';
-    const bio = document.getElementById('bioText').textContent || 'BIO TEXT';
-    const avatarImg = document.getElementById('avatarImg');
-
-    let points = [];
-    points = points.concat(createParticlesFromText(username, 'bold 48px Montserrat', window.innerWidth/2, window.innerHeight/2 - 100));
-    points = points.concat(createParticlesFromText(bio, '18px Poppins', window.innerWidth/2, window.innerHeight/2));
-    if(avatarImg.complete){
-      points = points.concat(createParticlesFromImage(avatarImg, window.innerWidth/2 - 70, window.innerHeight/2 - 200, 0.35));
-    }
-
-    particles = points.map(p=>{
-      return {
-        x: Math.random()*window.innerWidth*DPR,
-        y: Math.random()*window.innerHeight*DPR,
-        tx: p.x*DPR,
-        ty: p.y*DPR,
-        color: '#fff',
-        size: 1 + Math.random()*2
-      };
+    star.animate([
+      { transform: 'translate(-50%,-50%) scale(1)', opacity: 1 },
+      { transform: `translate(${dx}px, ${dy}px) scale(0.6)`, opacity: 0 }
+    ], {
+      duration: 5000, // 5 giây
+      easing: 'ease-out',
+      fill: 'forwards'
     });
-  }
 
-  function animateParticles(duration=2000){
-    const start = performance.now();
-    animating = true;
-    function frame(now){
-      const t = Math.min(1, (now - start)/duration);
-      ctxP.clearRect(0,0,particleCanvas.width, particleCanvas.height);
-      particles.forEach(p=>{
-        const progress = t<0.8 ? t : t + 0.2*(Math.sin((t-0.8)*Math.PI));
-        const x = p.x + (p.tx - p.x) * progress;
-        const y = p.y + (p.ty - p.y) * progress;
-        let col = p.color;
-        if(t>0.7){
-          const mix = Math.floor((t-0.7)/0.3*255);
-          col = `rgb(${255}, ${255 - mix*0.5}, ${255})`;
-        }
-        ctxP.fillStyle = col;
-        ctxP.beginPath();
-        ctxP.arc(x, y, p.size, 0, Math.PI*2);
-        ctxP.fill();
-      });
-      if(t<1){
-        requestAnimationFrame(frame);
-      } else {
-        animating = false;
-        particleCanvas.style.display = 'none';
-        document.querySelector('.wrap').style.opacity = 1;
-      }
-    }
-    requestAnimationFrame(frame);
+    setTimeout(() => star.remove(), 5000);
   }
+}
 
-  window.startParticleIntro = function(){
-    particleCanvas.style.display = 'block';
-    document.querySelector('.wrap').style.opacity = 0;
-    initParticles();
-    animateParticles(2000);
-  };
-})();
+// Gọi khi nhấn ENTER
+enterBtn.addEventListener('click', () => {
+  burstBigStars();
+});
 </script>
+
 </body>
 </html>
