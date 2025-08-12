@@ -3,7 +3,7 @@ from flask import Flask, render_template, url_for
 
 app = Flask(__name__, static_folder='static')
 
-# ====== cấu hình (thay bằng link bạn muốn) ======
+
 FB_LINK = "https://www.facebook.com/NguyenTrong6565"
 DISCORD_LINK = "https://discord.gg/bpZqKr2EWQ"
 USERNAME = "Nguyen Trong"
@@ -11,7 +11,7 @@ BIO_LINE = "Anh Trọng chim dài, còn em đóng vai người chồng bất l�
 BANNER_FILE = "banner.mp4"
 AVATAR_FILE = "avatar.png"
 MUSIC_FILE = "music.mp3"
-# ================================================
+# mấy cái ở trên vô dụng bị overlay trong html đè lên rồi nên tất cả chỉnh trong html 
 
 def static_if_exists(fname):
     path = os.path.join(app.root_path, "static", fname)
@@ -31,5 +31,5 @@ def home():
     )
 
 if __name__ == "__main__":
-    # debug=True khi dev, tắt khi deploy
+
     app.run(host="0.0.0.0", port=5000, debug=True)
