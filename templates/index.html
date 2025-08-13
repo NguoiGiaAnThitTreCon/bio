@@ -323,8 +323,127 @@ body::before {
 /* Shooting star */
 .shooting-star { position:fixed; width:2px; height:90px; background: linear-gradient(90deg, rgba(255,255,255,1), rgba(255,255,255,0)); z-index:8; pointer-events:none; transform: rotate(-30deg); filter: blur(1px); }
 /* ===== NEW UPGRADE CSS (END) ===== */
-</style></head>
+</style>
+<style>
+#swirlCanvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+}
+</style>
+
+<style>
+/* Glitch Username + Typewriter Bio Effects */
+.username {
+    display: flex;
+    gap: 5px;
+}
+.username span {
+    opacity: 0;
+    transform: translateY(-50px);
+    display: inline-block;
+    animation: flyIn 0.8s forwards;
+    color: #c77dff;
+    text-shadow: 0 0 5px #d0aaff, 0 0 10px #c77dff;
+}
+@keyframes flyIn {
+    to { opacity: 1; transform: translateY(0); }
+}
+.glitch {
+    position: relative;
+    animation: glitchAnim 0.5s infinite;
+}
+@keyframes glitchAnim {
+    0% { text-shadow: 2px 0 purple, -2px 0 cyan; }
+    20% { text-shadow: -2px 0 purple, 2px 0 cyan; }
+    40% { text-shadow: 2px 0 purple, -2px 0 cyan; }
+    60% { text-shadow: -2px 0 purple, 2px 0 cyan; }
+    100% { text-shadow: 2px 0 purple, -2px 0 cyan; }
+}
+.bio {
+    white-space: pre-wrap;
+    position: relative;
+    z-index: 2;
+}
+.streak {
+    position: absolute;
+    width: 80px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, white, transparent);
+    top: 0;
+    left: -100px;
+    animation: streakAnim 3s linear infinite;
+}
+@keyframes streakAnim {
+    to { left: 110%; }
+}
+</style>
+<style>
+/* Glass Morphism Card */
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 20px rgba(199, 125, 255, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Neon Border Sweep */
+.card::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(from 0deg, transparent, #c77dff, transparent 30%);
+    animation: rotateBorder 4s linear infinite;
+    z-index: 1;
+}
+@keyframes rotateBorder {
+    to { transform: rotate(360deg); }
+}
+
+/* Cyberpunk Scanline */
+.scanline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent 0%, rgba(199,125,255,0.3) 50%, transparent 100%);
+    animation: scanMove 2s linear forwards;
+    z-index: 2;
+}
+@keyframes scanMove {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(100%); }
+}
+
+/* Glow Trail when mouse moves */
+.glow-dot {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle, rgba(199,125,255,0.8), transparent);
+    pointer-events: none;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: fadeOut 0.8s forwards;
+    z-index: 3;
+}
+@keyframes fadeOut {
+    to { opacity: 0; transform: translate(-50%, -50%) scale(2); }
+}
+</style>
+</head>
 <body>
+<canvas id="swirlCanvas"></canvas>
 
   <div id="vanta-bg"></div>
   <div class="overlay"></div>
@@ -1025,42 +1144,182 @@ setInterval(()=>{
 })();
 </script>
 <script>
-function burstBigStars() {
-  const count = 50; // số sao
-  for (let i = 0; i < count; i++) {
-    const star = document.createElement('div');
-    star.className = 'big-star';
-    const size = 8 + Math.random() * 40; // to hơn
-    star.style.width = size + 'px';
-    star.style.height = size + 'px';
-    star.style.left = window.innerWidth / 2 + 'px';
-    star.style.top = window.innerHeight / 2 + 'px';
-    document.body.appendChild(star);
 
-    // vị trí ngẫu nhiên bay ra
-    const angle = Math.random() * Math.PI * 2;
-    const distance = 100 + Math.random() * 500;
-    const dx = Math.cos(angle) * distance;
-    const dy = Math.sin(angle) * distance;
 
-    star.animate([
-      { transform: 'translate(-50%,-50%) scale(1)', opacity: 1 },
-      { transform: `translate(${dx}px, ${dy}px) scale(0.6)`, opacity: 0 }
-    ], {
-      duration: 5000, // 5 giây
-      easing: 'ease-out',
-      fill: 'forwards'
-    });
 
-    setTimeout(() => star.remove(), 5000);
-  }
-}
-
-// Gọi khi nhấn ENTER
-enterBtn.addEventListener('click', () => {
-  burstBigStars();
-});
 </script>
 
+
+<script>
+(function(){
+  const canvas = document.getElementById('swirlCanvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let animationId;
+  function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  window.addEventListener('resize', resize); resize();
+
+  function createSwirlParticles(targetX, targetY, count=200){
+    particles = [];
+    for(let i=0;i<count;i++){
+      const angle = Math.random()*Math.PI*2;
+      const radius = Math.max(window.innerWidth, window.innerHeight) * 0.6 + Math.random()*200;
+      const spiralOffset = Math.random() * Math.PI * 4; // độ xoáy
+      particles.push({
+        angle: angle + spiralOffset,
+        radius: radius,
+        tx: targetX + (Math.random()-0.5)*120,
+        ty: targetY + (Math.random()-0.5)*60,
+        size: Math.random()*3+1,
+        speed: 0.02 + Math.random()*0.015,
+        opacity: 1
+      });
+    }
+  }
+
+  function animateSwirl(callback){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    let allArrived = true;
+    for(let p of particles){
+      if(p.radius > 20){
+        allArrived = false;
+        p.angle += 0.08; // tốc độ xoáy
+        p.radius *= 0.94; // thu hẹp quỹ đạo
+        p.x = canvas.width/2 + Math.cos(p.angle) * p.radius;
+        p.y = canvas.height/2 + Math.sin(p.angle) * p.radius;
+      } else {
+        p.x += (p.tx - p.x) * 0.1;
+        p.y += (p.ty - p.y) * 0.1;
+      }
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(255,255,255,' + p.opacity + ')';
+      ctx.shadowColor = '#fff';
+      ctx.shadowBlur = 8;
+      ctx.fill();
+    }
+    if(!allArrived){
+      animationId = requestAnimationFrame(()=>animateSwirl(callback));
+    } else {
+      if(callback) setTimeout(callback, 150);
+      fadeOutSwirl();
+    }
+  }
+
+  function fadeOutSwirl(){
+    let opacity = 1;
+    function fade(){
+      opacity -= 0.05;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.globalAlpha = Math.max(opacity,0);
+      for(let p of particles){
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(255,255,255,1)';
+        ctx.shadowColor = '#fff';
+        ctx.shadowBlur = 8;
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      if(opacity > 0){
+        requestAnimationFrame(fade);
+      } else {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+      }
+    }
+    fade();
+  }
+
+  // Trigger khi nhấn ENTER
+  const enterBtn = document.getElementById('enterBtn');
+  enterBtn.addEventListener('click', ()=>{
+    const card = document.querySelector('.card');
+    card.style.opacity = 0;
+    card.style.transform = 'scale(0.9)';
+    const rect = card.getBoundingClientRect();
+    const centerX = rect.left + rect.width/2;
+    const centerY = rect.top + rect.height/2;
+    createSwirlParticles(centerX, centerY, 200);
+    animateSwirl(()=>{
+      card.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+      card.style.opacity = 1;
+      card.style.transform = 'scale(1)';
+    });
+  });
+})();
+</script>
+
+<script>
+// Glitch Username Fly-in
+(function(){
+    const displayName = 'NguyenTrongg';
+    const usernameEl = document.querySelector('.username') || document.getElementById('username');
+    if (usernameEl) {
+        usernameEl.innerHTML = '';
+        displayName.split('').forEach((char, i) => {
+            const span = document.createElement('span');
+            span.textContent = char;
+            span.style.animationDelay = `${i * 0.1}s`;
+            span.classList.add('glitch');
+            usernameEl.appendChild(span);
+        });
+    }
+})();
+
+// Typewriter Bio
+(function(){
+    const bioString = "Anh Trọng đẹp trai chim dài, còn em chim ngắn";
+    let bioIndex = 0;
+    const bioEl = document.querySelector('.bio') || document.getElementById('bio');
+    function typewriterText(text, speed) {
+        if (bioIndex < text.length) {
+            bioEl.textContent += text.charAt(bioIndex);
+            bioIndex++;
+            setTimeout(() => typewriterText(text, speed), speed);
+        }
+    }
+    if (bioEl) {
+        bioEl.textContent = '';
+        typewriterText(bioString, 28);
+    }
+})();
+
+// Random streaks across bio
+(function(){
+    function createStreak() {
+        const streak = document.createElement('div');
+        streak.classList.add('streak');
+        streak.style.top = Math.random() * window.innerHeight + 'px';
+        document.body.appendChild(streak);
+        setTimeout(() => streak.remove(), 3000);
+    }
+    setInterval(createStreak, 800);
+})();
+</script>
+<script>
+// Add scanline effect
+(function(){
+    const card = document.querySelector('.card') || document.body;
+    const scan = document.createElement('div');
+    scan.classList.add('scanline');
+    card.appendChild(scan);
+    setTimeout(() => {
+        scan.remove();
+    }, 2000); // remove after animation
+})();
+
+// Glow trail effect on mouse move over card
+(function(){
+    const card = document.querySelector('.card') || document.body;
+    card.addEventListener('mousemove', (e) => {
+        const dot = document.createElement('div');
+        dot.classList.add('glow-dot');
+        dot.style.left = e.offsetX + 'px';
+        dot.style.top = e.offsetY + 'px';
+        card.appendChild(dot);
+        setTimeout(() => dot.remove(), 800);
+    });
+})();
+</script>
 </body>
 </html>
